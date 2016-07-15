@@ -1,0 +1,18 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AttendanceCore.DeviceAccess" GeneratedClassName="Devices">
+  <Profiles />
+  <Settings>
+    <Setting Name="EntradaCoorporativo" Type="System.String" Scope="User">
+      <Value Profile="(Default)">192.168.1.20</Value>
+    </Setting>
+    <Setting Name="EntradaCEDIS" Type="System.String" Scope="User">
+      <Value Profile="(Default)">192.168.3.201</Value>
+    </Setting>
+    <Setting Name="ComedorCoorporativo" Type="System.String" Scope="User">
+      <Value Profile="(Default)">172.179.1.90</Value>
+    </Setting>
+    <Setting Name="ComedorCEDIS" Type="System.String" Scope="User">
+      <Value Profile="(Default)">192.168.3.202</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>
