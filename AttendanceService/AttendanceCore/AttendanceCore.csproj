@@ -13,7 +13,8 @@
     <ProjectTypeGuids>{3D9AD99F-2412-4246-B90B-4EAA41C64699};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <StartArguments>/client:"WcfTestClient.exe"</StartArguments>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <SccProjectName>SAK</SccProjectName>
     <SccLocalPath>SAK</SccLocalPath>
     <SccAuxPath>SAK</SccAuxPath>
@@ -28,7 +29,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -40,8 +41,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="MySql.Data, Version=6.8.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
-    <Reference Include="MySql.Data.Entity, Version=6.8.3.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
+    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Libs\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -119,6 +122,27 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libs\commpro.dll" />
+    <Content Include="Libs\comms.dll" />
+    <Content Include="Libs\MySql.Data.dll" />
+    <Content Include="Libs\plce.dll" />
+    <Content Include="Libs\readme.txt" />
+    <Content Include="Libs\rscagent.dll" />
+    <Content Include="Libs\rscomm.dll" />
+    <Content Include="Libs\tcpcomm.dll" />
+    <Content Include="Libs\usbcomm.dll" />
+    <Content Include="Libs\x64\commpro.dll" />
+    <Content Include="Libs\x64\comms.dll" />
+    <Content Include="Libs\x64\rscagent.dll" />
+    <Content Include="Libs\x64\rscomm.dll" />
+    <Content Include="Libs\x64\tcpcomm.dll" />
+    <Content Include="Libs\x64\usbcomm.dll" />
+    <Content Include="Libs\x64\zkemkeeper.dll" />
+    <Content Include="Libs\x64\zkemsdk.dll" />
+    <Content Include="Libs\zkemkeeper.dll" />
+    <Content Include="Libs\zkemsdk.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
