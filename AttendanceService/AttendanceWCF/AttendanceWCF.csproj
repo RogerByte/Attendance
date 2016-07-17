@@ -111,9 +111,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>5590</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost/AttendanceService</IISUrl>
-          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost/AttendanceService</IISAppRootUrl>
+          <IISUrl>http://localhost/AttendanceService/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>http://192.168.1.22:8081/AttendanceService</CustomServerUrl>
