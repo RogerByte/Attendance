@@ -56,20 +56,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BusinessLogic\AttendanceController.cs" />
-    <Compile Include="BusinessLogic\BusinessLogic.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>BusinessLogic.settings</DependentUpon>
-    </Compile>
     <Compile Include="BusinessLogic\Log.cs" />
     <Compile Include="DataAccess\AttendanceDA.cs" />
     <Compile Include="DataAccess\ElsabonDA.cs" />
     <Compile Include="DeviceAccess\DeviceDriver.cs" />
-    <Compile Include="DeviceAccess\Devices.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Devices.settings</DependentUpon>
-    </Compile>
     <Compile Include="Entities\Catalogo.cs" />
     <Compile Include="Entities\ComedorExcel.cs" />
     <Compile Include="Entities\ComplementoEmpleado.cs" />
@@ -102,14 +92,6 @@
   <ItemGroup>
     <None Include="App.config">
       <SubType>Designer</SubType>
-    </None>
-    <None Include="BusinessLogic\BusinessLogic.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>BusinessLogic.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="DeviceAccess\Devices.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Devices.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

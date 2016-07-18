@@ -299,6 +299,18 @@ public class Layout
 				cell = row.createCell(3);
 				cell.setCellStyle(cellStyle);
 				cell.setCellValue(new HSSFRichTextString("Concepto"));
+				cell = row.createCell(4);
+				cell.setCellStyle(cellStyle);
+				cell.setCellValue(new HSSFRichTextString("Razón social"));
+				cell = row.createCell(5);
+				cell.setCellStyle(cellStyle);
+				cell.setCellValue(new HSSFRichTextString("Tipo de Nómina"));
+				cell = row.createCell(6);
+				cell.setCellStyle(cellStyle);
+				cell.setCellValue(new HSSFRichTextString("Centro de costos"));
+				cell = row.createCell(7);
+				cell.setCellStyle(cellStyle);
+				cell.setCellValue(new HSSFRichTextString("Descripcion centro de costos"));
 				int Fila = 1;
 				for(ReporteIncidencia Registro : Registros)
 				{
@@ -311,6 +323,14 @@ public class Layout
 					cell.setCellValue(Registro.getFecha());
 					cell = row.createCell(3);
 					cell.setCellValue(Registro.getConcepto());
+					cell = row.createCell(4);
+					cell.setCellValue(Registro.getRazonSocial());
+					cell = row.createCell(5);
+					cell.setCellValue(Registro.getNomina());
+					cell = row.createCell(6);
+					cell.setCellValue(Registro.getClaveCentroCostos());
+					cell = row.createCell(7);
+					cell.setCellValue(Registro.getDescripcionCentroCostos());
 					Fila++;
 				}
 				FileOutputStream fileOut = new FileOutputStream(getArchivo().endsWith(".xls") ? getArchivo() : getArchivo() + ".xls");

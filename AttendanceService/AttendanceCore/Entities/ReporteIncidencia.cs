@@ -16,6 +16,10 @@ namespace AttendanceCore.Entities
             Nomina = string.Empty;
             Fecha = string.Empty;
             Concepto = string.Empty;
+
+            RazonSocial = string.Empty;
+            ClaveCentroCostos = string.Empty;
+            DescripcionCentroCostos = string.Empty;
         }
         public int EmpleadoId { get; set; }
         public int NumeroEmpleado { get; set; }
@@ -24,5 +28,9 @@ namespace AttendanceCore.Entities
         public string Nomina { get; set; }
         public string Fecha { get; set; }
         public string Concepto { get; set; }
+
+        public string RazonSocial { get; set; }
+        public string ClaveCentroCostos { get; set; }
+        public string DescripcionCentroCostos { get; set; }
     }
 }

@@ -84,9 +84,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="App_Data\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\AttendanceCore\AttendanceCore.csproj">
       <Project>{F4A251EC-0D6A-4688-B4D7-378035DB25F2}</Project>

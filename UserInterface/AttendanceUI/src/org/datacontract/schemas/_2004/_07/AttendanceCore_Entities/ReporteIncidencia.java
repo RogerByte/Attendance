@@ -8,9 +8,13 @@
 package org.datacontract.schemas._2004._07.AttendanceCore_Entities;
 
 public class ReporteIncidencia  implements java.io.Serializable {
+    private java.lang.String claveCentroCostos;
+
     private java.lang.String compania;
 
     private java.lang.String concepto;
+
+    private java.lang.String descripcionCentroCostos;
 
     private java.lang.Integer empleadoId;
 
@@ -22,24 +26,52 @@ public class ReporteIncidencia  implements java.io.Serializable {
 
     private java.lang.Integer numeroEmpleado;
 
+    private java.lang.String razonSocial;
+
     public ReporteIncidencia() {
     }
 
     public ReporteIncidencia(
+           java.lang.String claveCentroCostos,
            java.lang.String compania,
            java.lang.String concepto,
+           java.lang.String descripcionCentroCostos,
            java.lang.Integer empleadoId,
            java.lang.String fecha,
            java.lang.String nombreEmpleado,
            java.lang.String nomina,
-           java.lang.Integer numeroEmpleado) {
+           java.lang.Integer numeroEmpleado,
+           java.lang.String razonSocial) {
+           this.claveCentroCostos = claveCentroCostos;
            this.compania = compania;
            this.concepto = concepto;
+           this.descripcionCentroCostos = descripcionCentroCostos;
            this.empleadoId = empleadoId;
            this.fecha = fecha;
            this.nombreEmpleado = nombreEmpleado;
            this.nomina = nomina;
            this.numeroEmpleado = numeroEmpleado;
+           this.razonSocial = razonSocial;
+    }
+
+
+    /**
+     * Gets the claveCentroCostos value for this ReporteIncidencia.
+     * 
+     * @return claveCentroCostos
+     */
+    public java.lang.String getClaveCentroCostos() {
+        return claveCentroCostos;
+    }
+
+
+    /**
+     * Sets the claveCentroCostos value for this ReporteIncidencia.
+     * 
+     * @param claveCentroCostos
+     */
+    public void setClaveCentroCostos(java.lang.String claveCentroCostos) {
+        this.claveCentroCostos = claveCentroCostos;
     }
 
 
@@ -80,6 +112,26 @@ public class ReporteIncidencia  implements java.io.Serializable {
      */
     public void setConcepto(java.lang.String concepto) {
         this.concepto = concepto;
+    }
+
+
+    /**
+     * Gets the descripcionCentroCostos value for this ReporteIncidencia.
+     * 
+     * @return descripcionCentroCostos
+     */
+    public java.lang.String getDescripcionCentroCostos() {
+        return descripcionCentroCostos;
+    }
+
+
+    /**
+     * Sets the descripcionCentroCostos value for this ReporteIncidencia.
+     * 
+     * @param descripcionCentroCostos
+     */
+    public void setDescripcionCentroCostos(java.lang.String descripcionCentroCostos) {
+        this.descripcionCentroCostos = descripcionCentroCostos;
     }
 
 
@@ -182,6 +234,26 @@ public class ReporteIncidencia  implements java.io.Serializable {
         this.numeroEmpleado = numeroEmpleado;
     }
 
+
+    /**
+     * Gets the razonSocial value for this ReporteIncidencia.
+     * 
+     * @return razonSocial
+     */
+    public java.lang.String getRazonSocial() {
+        return razonSocial;
+    }
+
+
+    /**
+     * Sets the razonSocial value for this ReporteIncidencia.
+     * 
+     * @param razonSocial
+     */
+    public void setRazonSocial(java.lang.String razonSocial) {
+        this.razonSocial = razonSocial;
+    }
+
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
         if (!(obj instanceof ReporteIncidencia)) return false;
@@ -194,12 +266,18 @@ public class ReporteIncidencia  implements java.io.Serializable {
         __equalsCalc = obj;
         boolean _equals;
         _equals = true && 
+            ((this.claveCentroCostos==null && other.getClaveCentroCostos()==null) || 
+             (this.claveCentroCostos!=null &&
+              this.claveCentroCostos.equals(other.getClaveCentroCostos()))) &&
             ((this.compania==null && other.getCompania()==null) || 
              (this.compania!=null &&
               this.compania.equals(other.getCompania()))) &&
             ((this.concepto==null && other.getConcepto()==null) || 
              (this.concepto!=null &&
               this.concepto.equals(other.getConcepto()))) &&
+            ((this.descripcionCentroCostos==null && other.getDescripcionCentroCostos()==null) || 
+             (this.descripcionCentroCostos!=null &&
+              this.descripcionCentroCostos.equals(other.getDescripcionCentroCostos()))) &&
             ((this.empleadoId==null && other.getEmpleadoId()==null) || 
              (this.empleadoId!=null &&
               this.empleadoId.equals(other.getEmpleadoId()))) &&
@@ -214,7 +292,10 @@ public class ReporteIncidencia  implements java.io.Serializable {
               this.nomina.equals(other.getNomina()))) &&
             ((this.numeroEmpleado==null && other.getNumeroEmpleado()==null) || 
              (this.numeroEmpleado!=null &&
-              this.numeroEmpleado.equals(other.getNumeroEmpleado())));
+              this.numeroEmpleado.equals(other.getNumeroEmpleado()))) &&
+            ((this.razonSocial==null && other.getRazonSocial()==null) || 
+             (this.razonSocial!=null &&
+              this.razonSocial.equals(other.getRazonSocial())));
         __equalsCalc = null;
         return _equals;
     }
@@ -226,11 +307,17 @@ public class ReporteIncidencia  implements java.io.Serializable {
         }
         __hashCodeCalc = true;
         int _hashCode = 1;
+        if (getClaveCentroCostos() != null) {
+            _hashCode += getClaveCentroCostos().hashCode();
+        }
         if (getCompania() != null) {
             _hashCode += getCompania().hashCode();
         }
         if (getConcepto() != null) {
             _hashCode += getConcepto().hashCode();
+        }
+        if (getDescripcionCentroCostos() != null) {
+            _hashCode += getDescripcionCentroCostos().hashCode();
         }
         if (getEmpleadoId() != null) {
             _hashCode += getEmpleadoId().hashCode();
@@ -247,6 +334,9 @@ public class ReporteIncidencia  implements java.io.Serializable {
         if (getNumeroEmpleado() != null) {
             _hashCode += getNumeroEmpleado().hashCode();
         }
+        if (getRazonSocial() != null) {
+            _hashCode += getRazonSocial().hashCode();
+        }
         __hashCodeCalc = false;
         return _hashCode;
     }
@@ -258,6 +348,13 @@ public class ReporteIncidencia  implements java.io.Serializable {
     static {
         typeDesc.setXmlType(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/AttendanceCore.Entities", "ReporteIncidencia"));
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("claveCentroCostos");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/AttendanceCore.Entities", "ClaveCentroCostos"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("compania");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/AttendanceCore.Entities", "Compania"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
@@ -267,6 +364,13 @@ public class ReporteIncidencia  implements java.io.Serializable {
         elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("concepto");
         elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/AttendanceCore.Entities", "Concepto"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("descripcionCentroCostos");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/AttendanceCore.Entities", "DescripcionCentroCostos"));
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
         elemField.setMinOccurs(0);
         elemField.setNillable(true);
@@ -305,6 +409,13 @@ public class ReporteIncidencia  implements java.io.Serializable {
         elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
         elemField.setMinOccurs(0);
         elemField.setNillable(false);
+        typeDesc.addFieldDesc(elemField);
+        elemField = new org.apache.axis.description.ElementDesc();
+        elemField.setFieldName("razonSocial");
+        elemField.setXmlName(new javax.xml.namespace.QName("http://schemas.datacontract.org/2004/07/AttendanceCore.Entities", "RazonSocial"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        elemField.setMinOccurs(0);
+        elemField.setNillable(true);
         typeDesc.addFieldDesc(elemField);
     }
 
