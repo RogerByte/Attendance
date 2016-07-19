@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<fx:root prefHeight="586.0" prefWidth="1006.0" type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="javafx.scene.layout.AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <StackPane blendMode="MULTIPLY" layoutY="-1.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -30,33 +30,15 @@
             </Line>
             <VBox spacing="10.0">
                <children>
-                  <HBox prefHeight="25.0" prefWidth="713.0" spacing="10.0">
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
                      <children>
-                        <Label prefHeight="25.0" text="Fecha Inicio: " />
-                        <GridPane fx:id="datePane_ini" prefHeight="25.0" prefWidth="100.0">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                        </GridPane>
-                        <Label prefHeight="25.0" text="Fecha Fin:" />
-                        <GridPane fx:id="datePane_fin" prefHeight="25.0" prefWidth="100.0">
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                        </GridPane>
-                        <Label prefHeight="25.0" prefWidth="59.0" text="Compañía:" />
-                        <ChoiceBox fx:id="cmbCompanias" prefHeight="25.0" prefWidth="220.0" />
-                        <Label text="Nómina:" />
-                        <ChoiceBox fx:id="cmbNomina" prefHeight="25.0" prefWidth="225.0" />
+                        <Label text="Fecha Inicio: " />
+                        <DatePicker fx:id="dtpkFecInicio" />
+                        <Label text="Fecha Fin:" />
+                        <DatePicker fx:id="dtpkFecFinal" />
                         <Label text="Número de Empleado:" />
-                        <TextField fx:id="txtNumEmpleadoComedor" onAction="#txtNumEmpleadoComedor_OnAction" prefHeight="25.0" prefWidth="90.0" />
-                        <Button fx:id="btnBuscar" mnemonicParsing="false" onAction="#btnBuscar_OnAction" prefHeight="26.0" prefWidth="31.0">
+                        <TextField fx:id="txtNumEmpleadoComedor" onAction="#txtNumEmpleadoComedor_OnAction" />
+                        <Button fx:id="btnBuscar" mnemonicParsing="false" onAction="#btnBuscar_OnAction">
                            <graphic>
                               <ImageView fitHeight="15.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -67,9 +49,8 @@
                         </Button>
                      </children>
                   </HBox>
-                  <HBox prefHeight="25.0" prefWidth="200.0" spacing="10.0">
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
                      <children>
-                        <Button fx:id="btnLayout" cancelButton="true" mnemonicParsing="false" onAction="#btnLayout_OnAction" text="Generar Layout" />
                         <Button fx:id="btnExcel" defaultButton="true" mnemonicParsing="false" onAction="#btnExcel_OnAction" text="Exportar Excel" textFill="WHITE" />
                         <Button fx:id="btnActualizaInformacion" mnemonicParsing="false" onAction="#btnActualizaInformacion_OnAction" text="Actualizar Información" />
                         <Button fx:id="Configuracion" mnemonicParsing="false" onAction="#Configuracion_OnAction" text="Configuración" />
@@ -93,7 +74,7 @@
                   <Cursor fx:constant="DEFAULT" />
                </cursor>
                <StackPane.margin>
-                  <Insets bottom="10.0" left="10.0" right="10.0" top="125.0" />
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="120.0" />
                </StackPane.margin>
             </TableView>
          </children>

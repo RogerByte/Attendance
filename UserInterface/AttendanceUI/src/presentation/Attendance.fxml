@@ -35,6 +35,36 @@
                   <Insets left="10.0" top="43.0" />
                </StackPane.margin>
             </Line>
+            <MenuBar StackPane.alignment="TOP_LEFT">
+              <menus>
+                <Menu mnemonicParsing="false" text="Reportes">
+                     <items>
+                        <Menu mnemonicParsing="false" text="Comedor">
+                          <items>
+                            <MenuItem fx:id="mnLayoutComedor" mnemonicParsing="false" text="Layout" />
+                              <MenuItem fx:id="mnInfoComedor" mnemonicParsing="false" text="Informativo" />
+                          </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Incidencias">
+                          <items>
+                            <MenuItem fx:id="mnLayoutIncidencias" mnemonicParsing="false" text="Layout" />
+                              <MenuItem fx:id="mdnInfoIncidencias" mnemonicParsing="false" text="Informativo" />
+                              <MenuItem fx:id="mnSalidas" mnemonicParsing="false" text="Salidas" />
+                          </items>
+                        </Menu>
+                     </items>
+                </Menu>
+                  <Menu mnemonicParsing="false" text="Configuración">
+                    <items>
+                      <MenuItem mnemonicParsing="false" text="Comedores" />
+                        <MenuItem mnemonicParsing="false" text="Incidencias" />
+                    </items>
+                  </Menu>
+              </menus>
+               <StackPane.margin>
+                  <Insets left="10.0" right="10.0" top="50.0" />
+               </StackPane.margin>
+            </MenuBar>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" StackPane.alignment="TOP_LEFT">
               <tabs>
                 <Tab fx:id="TabEmpleados" text="Empleados">
@@ -82,7 +112,7 @@
                   </Tab>
               </tabs>
                <StackPane.margin>
-                  <Insets left="10.0" right="10.0" top="70.0" />
+                  <Insets left="10.0" right="10.0" top="75.0" />
                </StackPane.margin>
             </TabPane>
          </children>

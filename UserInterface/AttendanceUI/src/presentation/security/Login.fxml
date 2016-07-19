@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.*?>
 <?import javafx.scene.shape.*?>
 <?import javafx.scene.text.*?>
@@ -9,42 +10,65 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
 
-<fx:root prefHeight="245.0" prefWidth="340.0" type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<fx:root type="AnchorPane" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <VBox layoutX="52.0" layoutY="112.0" prefHeight="63.0" prefWidth="246.0" spacing="10.0">
+      <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox alignment="TOP_RIGHT" prefHeight="25.0" prefWidth="200.0" spacing="10.0">
+            <Label text="Login Attendance" textFill="#185755" StackPane.alignment="TOP_LEFT">
+               <font>
+                  <Font size="20.0" />
+               </font>
+               <StackPane.margin>
+                  <Insets left="10.0" top="10.0" />
+               </StackPane.margin>
+            </Label>
+            <VBox spacing="10.0" StackPane.alignment="TOP_LEFT">
                <children>
-                  <Label text="Usuario:" />
-                  <TextField fx:id="txtUsuario" prefHeight="25.0" prefWidth="170.0" />
+                  <HBox>
+                     <children>
+                        <Label alignment="BASELINE_LEFT" text="Ingrese su usuario y contraseña:" wrapText="true">
+                           <font>
+                              <Font size="14.0" />
+                           </font>
+                        </Label>
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                     <children>
+                        <Label text="Usuario:" />
+                        <TextField fx:id="txtUsuario" prefHeight="25.0" prefWidth="170.0" />
+                     </children>
+                     <VBox.margin>
+                        <Insets right="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                     <children>
+                        <Label text="Contraseña:" />
+                        <PasswordField fx:id="txtPassword" onAction="#txtPassword_OnAction" prefHeight="25.0" prefWidth="170.0" />
+                     </children>
+                     <VBox.margin>
+                        <Insets right="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox alignment="BOTTOM_RIGHT" spacing="10.0">
+                     <children>
+                        <Button fx:id="btnCancelar" cancelButton="true" mnemonicParsing="false" onMouseClicked="#btnCancelar_onClick" text="Cancelar" />
+                        <Button fx:id="btnIngresar" defaultButton="true" mnemonicParsing="false" onMouseClicked="#btnIngresar_onClick" text="Ingresar" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </HBox>
                </children>
-            </HBox>
-            <HBox alignment="TOP_RIGHT" prefHeight="25.0" prefWidth="200.0" spacing="10.0">
-               <children>
-                  <Label text="Contraseña:" />
-                  <PasswordField fx:id="txtPassword" onAction="#txtPassword_OnAction" prefHeight="25.0" prefWidth="170.0" />
-               </children>
-            </HBox>
+               <StackPane.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="50.0" />
+               </StackPane.margin>
+            </VBox>
          </children>
-      </VBox>
-      <Label layoutX="10.0" layoutY="14.0" text="Control de Acceso" textFill="#185755" AnchorPane.leftAnchor="10.0">
-         <font>
-            <Font size="20.0" />
-         </font>
-      </Label>
-      <Rectangle arcWidth="5.0" fill="#24a19d" height="11.0" layoutX="203.0" stroke="#24a19d" strokeType="INSIDE" width="43.0" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="0.0" />
-      <HBox alignment="BOTTOM_RIGHT" layoutX="19.0" layoutY="243.0" prefHeight="37.0" prefWidth="311.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0">
-         <children>
-            <Button fx:id="btnCancelar" cancelButton="true" mnemonicParsing="false" onMouseClicked="#btnCancelar_onClick" text="Cancelar" />
-            <Button fx:id="btnIngresar" defaultButton="true" mnemonicParsing="false" onMouseClicked="#btnIngresar_onClick" text="Ingresar" />
-         </children>
-      </HBox>
-      <Label alignment="BASELINE_LEFT" layoutX="14.0" layoutY="55.0" prefHeight="37.0" prefWidth="238.0" text="Ingrese su usuario y contraseña." wrapText="true">
-         <font>
-            <Font size="14.0" />
-         </font>
-      </Label>
-      <Line endX="100.0" layoutX="115.0" layoutY="47.0" startX="-100.0" stroke="#24a19d" strokeWidth="2.0" AnchorPane.leftAnchor="10.0" />
-      <AmbientLight color="CHARTREUSE" lightOn="true" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
+      </StackPane>
    </children>
 </fx:root>

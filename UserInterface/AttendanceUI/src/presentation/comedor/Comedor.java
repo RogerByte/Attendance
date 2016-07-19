@@ -1,13 +1,8 @@
 package presentation.comedor;
 
 import java.io.IOException;
-import java.rmi.RemoteException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
-
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.EmpleadoComidas;
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.Usuario;
 import org.tempuri.AttendanceServiceProxy;
@@ -16,9 +11,7 @@ import ResponseContracts.AttendanceService.ServiceMessage;
 import presentation.common.Layout;
 import presentation.common.MessageController;
 import presentation.common.ProgressController;
-import presentation.common.entities.Catalogo;
 import presentation.common.entities.TaskResponse;
-import eu.schudt.javafx.controls.calendar.DatePicker;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -27,9 +20,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -41,7 +33,6 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -61,8 +52,7 @@ public class Comedor extends AnchorPane{
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			LoadControls();
 		}
 		catch (IOException exception){
@@ -83,10 +73,8 @@ public class Comedor extends AnchorPane{
 	public String getNomina(){
 		return Nomina;
 	}
-	@FXML GridPane datePane_ini = new GridPane();
-	private DatePicker dtpkFecInicio;
-	@FXML GridPane datePane_fin = new GridPane();
-	private DatePicker dtpkFecFinal;
+	@FXML DatePicker dtpkFecInicio;
+	@FXML DatePicker dtpkFecFinal;
 	@FXML TextField txtNumEmpleadoComedor = new TextField();
 	@FXML protected void txtNumEmpleadoComedor_OnAction()
 	{
@@ -141,85 +129,6 @@ public class Comedor extends AnchorPane{
 		ConfiguracionComedor VentanaConfiguracion = new ConfiguracionComedor();
 		VentanaConfiguracion.show();
 	}
-	@FXML Button btnLayout = new Button();
-	@FXML protected void btnLayout_OnAction(){
-		try
-		{
-			final ProgressController progress = new ProgressController(stage);
-			final MessageController Mensaje = new MessageController(stage);
-			FileChooser fileChooser = new FileChooser();
-			//Set extension filter
-	        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Archivos Texto (*.txt)", "*.pdf");
-	        fileChooser.getExtensionFilters().add(extFilter);
-	        //Show save file dialog
-	        final String path = fileChooser.showSaveDialog(stage).getAbsolutePath();
-			final Task<TaskResponse> task = new Task<TaskResponse>() {
-				@Override
-				protected TaskResponse call() throws Exception {
-					TaskResponse Response = new TaskResponse();
-					Catalogo entidad_nomina = cmbNomina.getItems().get(cmbNomina.getSelectionModel().getSelectedIndex());
-					if(entidad_nomina.id == 1000)
-						setNomina("");
-					else
-						setNomina(entidad_nomina.displayString);
-					Catalogo entidad_comapnias = cmbCompanias.getItems().get(cmbCompanias.getSelectionModel().getSelectedIndex());
-					if(entidad_comapnias.id == 1000)
-						setCompania("");
-					else
-						setCompania(entidad_comapnias.displayString);
-					Layout generadorLayout = new Layout(path);
-					try
-					{
-						Response = generadorLayout.GeneraLayoutComedor(DateToCalendar(dtpkFecInicio.selectedDateProperty().get()), 
-								DateToCalendar(dtpkFecFinal.selectedDateProperty().get()),
-								getNomina(),
-								getCompania()
-								);
-					}
-					catch(Exception exc)
-					{
-						Response.setMensaje("Excepción: " + exc.getMessage());
-						Response.setTipoMensaje(2);
-					}
-					updateProgress(10, 10);
-					return Response;
-				}
-			};
-			task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent event){
-					progress.closeProgress();
-					TaskResponse response = new TaskResponse();
-					response = (TaskResponse)task.getValue();
-					if(response.getTipoMensaje() == 2)
-					{
-						Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-					}
-					else
-					{
-						Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-					}
-				}
-			});
-			task.setOnFailed(new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent event){
-					progress.closeProgress();
-					TaskResponse response = new TaskResponse();
-					response = (TaskResponse)task.getValue();
-					if(response.getTipoMensaje() == 2){
-						Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-					}
-				}
-			});
-			progress.showProgess(task);
-			new Thread(task).start();
-		}
-		catch(Exception exc)
-		{
-			
-		}
-	}
 	@FXML Button btnExcel = new Button();
 	@FXML protected void btnExcel_OnAction(){
 		try
@@ -236,23 +145,11 @@ public class Comedor extends AnchorPane{
 				@Override
 				protected TaskResponse call() {
 					TaskResponse Response = new TaskResponse();
-					/*
-					Catalogo entidad_nomina = cmbNomina.getItems().get(cmbNomina.getSelectionModel().getSelectedIndex());
-					if(entidad_nomina.id == 1000)
-						setNomina("");
-					else
-						setNomina(entidad_nomina.displayString);
-					Catalogo entidad_comapnias = cmbCompanias.getItems().get(cmbCompanias.getSelectionModel().getSelectedIndex());
-					if(entidad_comapnias.id == 1000)
-						setCompania("");
-					else
-						setCompania(entidad_comapnias.displayString);
-					*/
 					Layout generadorLayout = new Layout(path);
 					try
 					{
-						Response = generadorLayout.ReporteComedorExcel(DateToCalendar(dtpkFecInicio.selectedDateProperty().get()), 
-								DateToCalendar(dtpkFecFinal.selectedDateProperty().get())
+						Response = generadorLayout.ReporteComedorExcel(DateToCalendar(dtpkFecInicio.getValue()), 
+								DateToCalendar(dtpkFecFinal.getValue())
 								);
 					}
 					catch(Exception exc)
@@ -346,11 +243,12 @@ public class Comedor extends AnchorPane{
 		progress.showProgess(task);
 		new Thread(task).start();
 	}
-	private static Calendar DateToCalendar(Date date){ 
-		  Calendar cal = Calendar.getInstance();
-		  cal.setTime(date);
-		  return cal;
-		}
+	private static Calendar DateToCalendar(LocalDate date)
+	{ 
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(java.sql.Date.valueOf(date));
+		return cal;
+	}
 	private TaskResponse FillGrid()
 	{
 		TaskResponse Response = new TaskResponse();
@@ -359,25 +257,9 @@ public class Comedor extends AnchorPane{
 			AttendanceServiceProxy Servicio = new AttendanceServiceProxy();
 			try 
 			{
-				Catalogo entidad_nomina = cmbNomina.getItems().get(cmbNomina.getSelectionModel().getSelectedIndex());
-				if(entidad_nomina.id == 1000)
-				{
-					setNomina("");
-				}
-				else
-				{
-					setNomina(entidad_nomina.displayString);
-				}
-				Catalogo entidad_comapnias = cmbCompanias.getItems().get(cmbCompanias.getSelectionModel().getSelectedIndex());
-				if(entidad_comapnias.id == 1000)
-				{
-					setCompania("");
-				}
-				else
-				{
-					setCompania(entidad_comapnias.displayString);
-				}
-				EmpleadoComidas[] Empleados = Servicio.obtenerEmpleadosComidas(Integer.parseInt(txtNumEmpleadoComedor.getText().isEmpty() ? "0" : txtNumEmpleadoComedor.getText()), "", getCompania(), getNomina(), DateToCalendar(dtpkFecInicio.selectedDateProperty().get()), DateToCalendar(dtpkFecFinal.selectedDateProperty().get()));
+				setNomina("");
+				setCompania("");
+				EmpleadoComidas[] Empleados = Servicio.obtenerEmpleadosComidas(Integer.parseInt(txtNumEmpleadoComedor.getText().isEmpty() ? "0" : txtNumEmpleadoComedor.getText()), "", getCompania(), getNomina(), DateToCalendar(dtpkFecInicio.getValue()), DateToCalendar(dtpkFecFinal.getValue()));
 				ObservableList<EmpleadoComidas> lst = FXCollections.observableArrayList(Empleados);
 				GridReporteComedor.setItems(lst);
 			}
@@ -403,9 +285,6 @@ public class Comedor extends AnchorPane{
 	@FXML TableColumn<EmpleadoComidas, String> tcNomina = new TableColumn<EmpleadoComidas, String>();
 	@FXML TableColumn<EmpleadoComidas, Integer> tcComidas = new TableColumn<EmpleadoComidas, Integer>();
 	@FXML TableColumn<EmpleadoComidas, String> tcDetail = new TableColumn<EmpleadoComidas, String>();
-	
-	@FXML ChoiceBox<Catalogo> cmbNomina = new ChoiceBox<Catalogo>();
-	@FXML ChoiceBox<Catalogo> cmbCompanias = new ChoiceBox<Catalogo>();
 	@FXML Button btnActualizaInformacion = new Button();
 	@FXML protected void btnActualizaInformacion_OnAction()
 	{
@@ -466,21 +345,8 @@ public class Comedor extends AnchorPane{
 	}
 	private void LoadControls()
 	{
-		dtpkFecInicio = new DatePicker(Locale.ENGLISH);
-		dtpkFecInicio.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-		dtpkFecInicio.getCalendarView().todayButtonTextProperty().set("Today");
-		dtpkFecInicio.getCalendarView().setShowWeeks(false);
-		dtpkFecInicio.getStylesheets().add("/presentation/DatePicker.css");
-		datePane_ini.add(dtpkFecInicio, 0, 0);
-		
-		dtpkFecFinal = new DatePicker(Locale.ENGLISH);
-		dtpkFecFinal.setDateFormat(new SimpleDateFormat("yyyy-MM-dd"));
-		dtpkFecFinal.getCalendarView().todayButtonTextProperty().set("Today");
-		dtpkFecFinal.getCalendarView().setShowWeeks(false);
-		dtpkFecFinal.getStylesheets().add("/presentation/DatePicker.css");
-		datePane_fin.add(dtpkFecFinal, 0, 0);
-		CargaCatalogoNomina();
-		CargaCatalogoCompania();
+		dtpkFecInicio.setShowWeekNumbers(false);
+		dtpkFecFinal.setShowWeekNumbers(false);
 		txtNumEmpleadoComedor.setOnKeyReleased(new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent arg0) {
@@ -499,127 +365,6 @@ public class Comedor extends AnchorPane{
 		tcComidas.setCellValueFactory(new PropertyValueFactory<EmpleadoComidas, Integer>("NumeroComidas"));
 		ColumnaDetalle();
 		
-	}
-	private void CargaCatalogoNomina()
-	{
-		final Task<TaskResponse> task = new Task<TaskResponse>(){
-
-			@Override
-			protected TaskResponse call() throws Exception {
-				TaskResponse Response = new TaskResponse();
-				AttendanceServiceProxy Servicio = new AttendanceServiceProxy();
-				ArrayList<Catalogo> CatalogoNomina = new ArrayList<Catalogo>();
-				try {
-					org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Nomina  = Servicio.obtenerCatalogoNomina();
-					if(Nomina.length > 0){
-						for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo modelo : Nomina){
-							Catalogo catalogo = new Catalogo(modelo.getId(), modelo.getDescripcion());
-							CatalogoNomina.add(catalogo);
-						}
-					}
-					ObservableList<Catalogo> ListaNomina = FXCollections.observableArrayList(CatalogoNomina);
-					cmbNomina.getItems().addAll(ListaNomina);
-					Response.setMensaje("Catálogo de nómina obtenido correctamente");
-					Response.setTipoMensaje(1);
-				}
-				catch (RemoteException e) {
-					Response.setMensaje("Error al obtener el catálogo de nómina");
-					Response.setTipoMensaje(2);
-				}
-				return Response;
-			}
-		};
-		final MessageController Mensaje = new MessageController(stage);
-		task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
-			@Override
-			public void handle(WorkerStateEvent event){
-				TaskResponse response = new TaskResponse();
-				response = (TaskResponse)task.getValue();
-				if(response.getTipoMensaje() == 2){
-					Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-				}
-				else
-				{
-					for(Catalogo obj : cmbNomina.getItems()){
-						if(obj.id.equals(1000)){
-							cmbNomina.getSelectionModel().select(obj);
-							break;
-						}
-					}
-				}
-			}
-		});
-		task.setOnFailed(new EventHandler<WorkerStateEvent>(){
-			@Override
-			public void handle(WorkerStateEvent event){
-				TaskResponse response = new TaskResponse();
-				response = (TaskResponse)task.getValue();
-				if(response.getTipoMensaje() == 2){
-					Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-				}
-			}
-		});
-		javafx.application.Platform.runLater(task);
-	}
-	private void CargaCatalogoCompania(){
-		final Task<TaskResponse> task = new Task<TaskResponse>(){
-
-			@Override
-			protected TaskResponse call() throws Exception {
-				TaskResponse Response = new TaskResponse();
-				AttendanceServiceProxy Servicio = new AttendanceServiceProxy();
-				ArrayList<Catalogo> CatalogoCompanias = new ArrayList<Catalogo>();
-				try {
-					org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Companias  = Servicio.obtenerCatalogoCompanias();
-					if(Companias.length > 0){
-						for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo modelo : Companias){
-							Catalogo catalogo = new Catalogo(modelo.getId(), modelo.getDescripcion());
-							CatalogoCompanias.add(catalogo);
-						}
-					}
-					ObservableList<Catalogo> ListaCompanias = FXCollections.observableArrayList(CatalogoCompanias);
-					cmbCompanias.getItems().addAll(ListaCompanias);
-					Response.setMensaje("Catálogo de compañías obtenido correctamente");
-					Response.setTipoMensaje(1);
-				}
-				catch (Exception e) {
-					Response.setMensaje("Error al obtener el catálogo de compañías");
-					Response.setTipoMensaje(2);
-				}
-				return Response;
-			}
-		};
-		final MessageController Mensaje = new MessageController(stage);
-		task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
-			@Override
-			public void handle(WorkerStateEvent event){
-				TaskResponse response = new TaskResponse();
-				response = (TaskResponse)task.getValue();
-				if(response.getTipoMensaje() == 2){
-					Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-				}
-				else
-				{
-					for(Catalogo obj : cmbCompanias.getItems()){
-						if(obj.id.equals(1000)){
-							cmbCompanias.getSelectionModel().select(obj);
-							break;
-						}
-					}
-				}
-			}
-		});
-		task.setOnFailed(new EventHandler<WorkerStateEvent>(){
-			@Override
-			public void handle(WorkerStateEvent event){
-				TaskResponse response = new TaskResponse();
-				response = (TaskResponse)task.getValue();
-				if(response.getTipoMensaje() == 2){
-					Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-				}
-			}
-		});
-		javafx.application.Platform.runLater(task);
 	}
 	private void ColumnaDetalle()
 	{
@@ -644,7 +389,7 @@ public class Comedor extends AnchorPane{
 									MessageController mensaje = new MessageController((Stage)GridReporteComedor.getScene().getWindow());
 									try
 									{
-										DetalleComidas Detalle = new DetalleComidas((EmpleadoComidas)GridReporteComedor.getSelectionModel().getSelectedItem(),  DateToCalendar(dtpkFecInicio.selectedDateProperty().get()), DateToCalendar(dtpkFecFinal.selectedDateProperty().get()));
+										DetalleComidas Detalle = new DetalleComidas((EmpleadoComidas)GridReporteComedor.getSelectionModel().getSelectedItem(),  DateToCalendar(dtpkFecInicio.getValue()), DateToCalendar(dtpkFecFinal.getValue()));
 										Detalle.show();
 									}
 									catch (Exception e){
@@ -664,11 +409,11 @@ public class Comedor extends AnchorPane{
 	private boolean ValidaFechas()
 	{
 		boolean valido = true;
-		if (dtpkFecInicio.selectedDateProperty().getValue() == null)
+		if (dtpkFecInicio.getValue() == null)
 		{
 			valido = false;
 		}
-		if (dtpkFecFinal.selectedDateProperty().getValue() == null)
+		if (dtpkFecFinal.getValue() == null)
 		{
 			valido = false;
 		}

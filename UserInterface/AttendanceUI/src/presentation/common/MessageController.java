@@ -64,7 +64,10 @@ public class MessageController extends AnchorPane
 	/**
 	 * @author Lázaro Adrián González Montoya
 	 * @param Mensaje Mensaje para mostrar en la ventana
-	 * @param config 1 - Correcto, 2 - Error, 3 - Pregunta
+	 * @param config <br>
+	 * 1 - Correcto <br>
+	 * 2 - Error <br>
+	 * 3 - Warning <br>
 	 */
 	public void showMessage(String Mensaje, int config)	{
 		loadComponent();
