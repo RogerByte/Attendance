@@ -21,6 +21,8 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -50,16 +52,22 @@ public class LayoutWindow extends AnchorPane{
 			fxmlLoader.load();
 			switch(getCase()){
 				case 1:
-					lblTitulo.setText("Layout comedores"); //Reporte layout de comedores
+					lblTitulo.setText("Layout comedores");
 					break;
 				case 2:
-					lblTitulo.setText("Layout incidencias"); //Reporte layout de incidencias
+					lblTitulo.setText("Layout incidencias");
 					break;
 				case 3:
 					lblTitulo.setText("Informativo Comedor");
+					vbControles.getChildren().remove(hbNumeroEmpleado);
+					vbControles.getChildren().remove(hbRazonSocial);
+					vbControles.getChildren().remove(hbNomina);
 					break;
 				case 4:
 					lblTitulo.setText("Informativo Incidencias");
+					vbControles.getChildren().remove(hbNumeroEmpleado);
+					vbControles.getChildren().remove(hbRazonSocial);
+					vbControles.getChildren().remove(hbNomina);
 					break;
 				default:
 					mensaje.btnSalir.setOnAction((e)->{
@@ -150,6 +158,10 @@ public class LayoutWindow extends AnchorPane{
 	@FXML Button btnCancelar;
 	@FXML Button btnGenerar;
 	
+	@FXML VBox vbControles;
+	@FXML HBox hbNumeroEmpleado;
+	@FXML HBox hbRazonSocial;
+	@FXML HBox hbNomina;
 	private void GenerarReporte(){
 		switch(getCase()){
 		case 1:
@@ -319,10 +331,143 @@ public class LayoutWindow extends AnchorPane{
 			}
 			break;
 		case 3:
-			
+			try
+			{
+				final ProgressController progress = new ProgressController(stage);
+				final MessageController Mensaje = new MessageController(stage);
+				FileChooser fileChooser = new FileChooser();
+				//Set extension filter
+		        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Archivos Excel (*.xls)", "*.xls");
+		        fileChooser.getExtensionFilters().add(extFilter);
+		        //Show save file dialog
+		        final String path = fileChooser.showSaveDialog(stage).getAbsolutePath();
+				final Task<TaskResponse> task = new Task<TaskResponse>() {
+					@Override
+					protected TaskResponse call() {
+						TaskResponse Response = new TaskResponse();
+						Layout generadorLayout = new Layout(path);
+						try
+						{
+							Response = generadorLayout.ReporteComedorExcel(ObtenerFecha(dtpkFechaInicio.getValue()), 
+									ObtenerFecha(dtpkFechaFin.getValue())
+									);
+						}
+						catch(Exception exc)
+						{
+							Response.setMensaje("Excepción: " + exc.getMessage());
+							Response.setTipoMensaje(2);
+						}
+						updateProgress(10, 10);
+						return Response;
+					}
+				};
+				task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
+					@Override
+					public void handle(WorkerStateEvent event){
+						progress.closeProgress();
+						TaskResponse response = new TaskResponse();
+						response = (TaskResponse)task.getValue();
+						if(response.getTipoMensaje() == 2)
+						{
+							Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
+						}
+						else
+						{
+							Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
+							getStage().close();
+						}
+					}
+				});
+				task.setOnFailed(new EventHandler<WorkerStateEvent>(){
+					@Override
+					public void handle(WorkerStateEvent event){
+						progress.closeProgress();
+						TaskResponse response = new TaskResponse();
+						response = (TaskResponse)task.getValue();
+						if(response.getTipoMensaje() == 2){
+							Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
+						}
+					}
+				});
+				progress.showProgess(task);
+				new Thread(task).start();
+			}
+			catch(Exception exc)
+			{
+				
+			}
 			break;
 		case 4:
-			
+			try
+			{
+				final ProgressController progress = new ProgressController(stage);
+				final MessageController Mensaje = new MessageController(stage);
+				FileChooser fileChooser = new FileChooser();
+				//Set extension filter
+		        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Archivos Excel (*.xls)", "*.xls");
+		        fileChooser.getExtensionFilters().add(extFilter);
+		        File Archivo = fileChooser.showSaveDialog(stage);
+		        final String path = Archivo != null ? Archivo.getAbsolutePath() : "";
+		        //Show save file dialog
+				final Task<TaskResponse> task = new Task<TaskResponse>() {
+					@Override
+					protected TaskResponse call() {
+						TaskResponse Response = new TaskResponse();
+						Layout generadorLayout = new Layout(path);
+						try
+						{
+							Response = generadorLayout.ReporteIncidencias(
+									ObtenerFecha(dtpkFechaInicio.getValue()), 
+									ObtenerFecha(dtpkFechaFin.getValue())
+									);
+						}
+						catch(Exception exc)
+						{
+							Response.setMensaje("Excepción: " + exc.getMessage());
+							Response.setTipoMensaje(2);
+						}
+						updateProgress(10, 10);
+						return Response;
+					}
+				};
+				task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
+					@Override
+					public void handle(WorkerStateEvent event){
+						progress.closeProgress();
+						TaskResponse response = new TaskResponse();
+						response = (TaskResponse)task.getValue();
+						if(response.getTipoMensaje() == 2)
+						{
+							Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
+						}
+						else
+						{
+							Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
+							getStage().close();
+						}
+					}
+				});
+				task.setOnFailed(new EventHandler<WorkerStateEvent>(){
+					@Override
+					public void handle(WorkerStateEvent event){
+						progress.closeProgress();
+						TaskResponse response = new TaskResponse();
+						response = (TaskResponse)task.getValue();
+						if(response.getTipoMensaje() == 2){
+							Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
+						}
+					}
+				});
+				if(path != ""){
+					progress.showProgess(task);
+					new Thread(task).start();
+				}
+			}
+			catch(Exception exc)
+			{
+				MessageController mensaje = new MessageController(getStage());
+				mensaje.showMessage("Error en la aplicación " + exc.getMessage(), 2);
+			}
 			break;
 		default:
 			break;

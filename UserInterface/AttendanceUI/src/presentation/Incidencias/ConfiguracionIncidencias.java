@@ -17,7 +17,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
@@ -45,10 +44,7 @@ public class ConfiguracionIncidencias extends AnchorPane
 		fxmlLoader.setController(this);
 		try
 		{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
-			LoadControls();
-			FillGrid();
+			fxmlLoader.load();
 		}
 		catch(Exception exc)
 		{
@@ -90,6 +86,8 @@ public class ConfiguracionIncidencias extends AnchorPane
 		stage.setTitle("Configuración de incidencias");
 		stage.setResizable(false);
 		stage.show();
+		LoadControls();
+		FillGrid();
 	}
 	public void FillGrid()
 	{

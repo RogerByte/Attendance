@@ -8,7 +8,6 @@ import org.datacontract.schemas._2004._07.AttendanceCore_Entities.Usuario;
 import org.tempuri.AttendanceServiceProxy;
 
 import ResponseContracts.AttendanceService.ServiceMessage;
-import presentation.common.Layout;
 import presentation.common.MessageController;
 import presentation.common.ProgressController;
 import presentation.common.entities.TaskResponse;
@@ -34,7 +33,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
@@ -122,79 +120,6 @@ public class Comedor extends AnchorPane{
 		});
 		progress.showProgess(task);
 		new Thread(task).start();
-	}
-	@FXML Button Configuracion = new Button();
-	@FXML protected void Configuracion_OnAction()
-	{
-		ConfiguracionComedor VentanaConfiguracion = new ConfiguracionComedor();
-		VentanaConfiguracion.show();
-	}
-	@FXML Button btnExcel = new Button();
-	@FXML protected void btnExcel_OnAction(){
-		try
-		{
-			final ProgressController progress = new ProgressController(stage);
-			final MessageController Mensaje = new MessageController(stage);
-			FileChooser fileChooser = new FileChooser();
-			//Set extension filter
-	        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Archivos Excel (*.xls)", "*.xls");
-	        fileChooser.getExtensionFilters().add(extFilter);
-	        //Show save file dialog
-	        final String path = fileChooser.showSaveDialog(stage).getAbsolutePath();
-			final Task<TaskResponse> task = new Task<TaskResponse>() {
-				@Override
-				protected TaskResponse call() {
-					TaskResponse Response = new TaskResponse();
-					Layout generadorLayout = new Layout(path);
-					try
-					{
-						Response = generadorLayout.ReporteComedorExcel(DateToCalendar(dtpkFecInicio.getValue()), 
-								DateToCalendar(dtpkFecFinal.getValue())
-								);
-					}
-					catch(Exception exc)
-					{
-						Response.setMensaje("Excepción: " + exc.getMessage());
-						Response.setTipoMensaje(2);
-					}
-					updateProgress(10, 10);
-					return Response;
-				}
-			};
-			task.setOnSucceeded(new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent event){
-					progress.closeProgress();
-					TaskResponse response = new TaskResponse();
-					response = (TaskResponse)task.getValue();
-					if(response.getTipoMensaje() == 2)
-					{
-						Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-					}
-					else
-					{
-						Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-					}
-				}
-			});
-			task.setOnFailed(new EventHandler<WorkerStateEvent>(){
-				@Override
-				public void handle(WorkerStateEvent event){
-					progress.closeProgress();
-					TaskResponse response = new TaskResponse();
-					response = (TaskResponse)task.getValue();
-					if(response.getTipoMensaje() == 2){
-						Mensaje.showMessage(response.getMensaje(), response.getTipoMensaje());
-					}
-				}
-			});
-			progress.showProgess(task);
-			new Thread(task).start();
-		}
-		catch(Exception exc)
-		{
-			
-		}
 	}
 	@FXML Button btnBuscar = new Button();
 	@FXML protected void btnBuscar_OnAction(){

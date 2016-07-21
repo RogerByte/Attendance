@@ -6,7 +6,6 @@
 	<classpathentry kind="lib" path="Lib/commons-codec-1.9.jar"/>
 	<classpathentry kind="lib" path="Lib/commons-logging-1.2-javadoc.jar"/>
 	<classpathentry kind="lib" path="Lib/commons-logging-1.2.jar"/>
-	<classpathentry kind="lib" path="Lib/javafx-datepicker-0.0.2.jar"/>
 	<classpathentry kind="lib" path="Lib/javax.mail.jar"/>
 	<classpathentry kind="lib" path="Lib/junit-4.11.jar"/>
 	<classpathentry kind="lib" path="Lib/poi-3.11-20141221.jar"/>
@@ -22,5 +21,6 @@
 	<classpathentry kind="lib" path="Lib/eclipse/org.apache.commons.logging_1.1.1.v201101211721.jar"/>
 	<classpathentry kind="lib" path="Lib/eclipse/saaj.jar"/>
 	<classpathentry kind="lib" path="Lib/controlsfx-8.40.11.jar"/>
+	<classpathentry kind="lib" path="Lib/javafx-datepicker-0.0.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -16,7 +16,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -34,8 +33,7 @@ public class Retardos extends AnchorPane
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			setEmpleado(Entidad);
 			lblNumeroEmpleado.setText(Empleado.getNumeroEmpleado().toString());
 			lblNombreEmpleado.setText(Empleado.getNombreEmpleado().toUpperCase());
@@ -44,11 +42,11 @@ public class Retardos extends AnchorPane
 			tcFechaRegistro.setCellValueFactory(new PropertyValueFactory<Retardo,String>("FechaRetardo"));
 			setFechaInicio(FechaInicio);
 			setFechaFin(FechaFin);
-			FillGrid();
 		}
 		catch(Exception exc)
 		{
-			throw new RuntimeException(exc);
+			MessageController Mensaje = new MessageController(stage);
+			Mensaje.showMessage("Error en la aplicación: " + exc.getMessage(), 2);
 		}
 	}
 	private final Stage stage = new Stage();
@@ -93,6 +91,7 @@ public class Retardos extends AnchorPane
 		stage.setTitle("Retardos acumulados");
 		stage.setResizable(true);
 		stage.show();
+		FillGrid();
 	}
 	public void FillGrid()
 	{

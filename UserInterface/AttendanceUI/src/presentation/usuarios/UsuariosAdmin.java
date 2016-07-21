@@ -14,7 +14,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -57,8 +56,7 @@ public class UsuariosAdmin extends AnchorPane
 		fxmlLoader.setController(this);
 		try
 		{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			LoadControls();
 			FillGrid("");
 		}
@@ -203,7 +201,8 @@ public class UsuariosAdmin extends AnchorPane
 								}
 							});
 						}
-						setGraphic(null);
+						else
+							setGraphic(null);
 					}
 				};
 				return cell;

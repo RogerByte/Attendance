@@ -14,7 +14,7 @@
    <children>
       <StackPane blendMode="MULTIPLY" layoutY="-1.0" prefHeight="91.0" prefWidth="673.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <Label text="Sistema Attendance" textFill="#008287" wrapText="true" StackPane.alignment="TOP_LEFT">
+            <Label text="Attendance" textFill="#008287" wrapText="true" StackPane.alignment="TOP_LEFT">
                <font>
                   <Font name="Segoe UI Semilight" size="24.0" />
                </font>
@@ -30,11 +30,6 @@
                   <Image url="@common/Images/fujifilm.gif" />
                </image>
             </ImageView>
-            <Line endX="210.0" stroke="#008287" strokeWidth="2.0" StackPane.alignment="TOP_LEFT">
-               <StackPane.margin>
-                  <Insets left="10.0" top="43.0" />
-               </StackPane.margin>
-            </Line>
             <MenuBar StackPane.alignment="TOP_LEFT">
               <menus>
                 <Menu mnemonicParsing="false" text="Reportes">
@@ -48,7 +43,7 @@
                         <Menu mnemonicParsing="false" text="Incidencias">
                           <items>
                             <MenuItem fx:id="mnLayoutIncidencias" mnemonicParsing="false" text="Layout" />
-                              <MenuItem fx:id="mdnInfoIncidencias" mnemonicParsing="false" text="Informativo" />
+                              <MenuItem fx:id="mnInfoIncidencias" mnemonicParsing="false" text="Informativo" />
                               <MenuItem fx:id="mnSalidas" mnemonicParsing="false" text="Salidas" />
                           </items>
                         </Menu>
@@ -56,8 +51,8 @@
                 </Menu>
                   <Menu mnemonicParsing="false" text="Configuración">
                     <items>
-                      <MenuItem mnemonicParsing="false" text="Comedores" />
-                        <MenuItem mnemonicParsing="false" text="Incidencias" />
+                      <MenuItem fx:id="mnConfiguracionComedores" mnemonicParsing="false" text="Comedores" />
+                        <MenuItem fx:id="mnConfiguracionIncidencias" mnemonicParsing="false" text="Incidencias" />
                     </items>
                   </Menu>
               </menus>

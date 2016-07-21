@@ -2,8 +2,10 @@ package presentation;
 
 import java.io.IOException;
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.Usuario;
+import presentation.Incidencias.ConfiguracionIncidencias;
 import presentation.Incidencias.Incidencias;
 import presentation.comedor.Comedor;
+import presentation.comedor.ConfiguracionComedor;
 import presentation.common.MessageController;
 import presentation.empleados.Empleados;
 import presentation.horarios.Horarios;
@@ -14,7 +16,6 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
-import javafx.concurrent.Task;
 import javafx.fxml.*;
 
 public class Attendance extends AnchorPane{
@@ -34,9 +35,26 @@ public class Attendance extends AnchorPane{
 				LayoutWindow VentanaReporteLayoutIncidencias = new LayoutWindow(2);
 				VentanaReporteLayoutIncidencias.show();
 			});
+			mnConfiguracionComedores.setOnAction((e)->{
+				ConfiguracionComedor VentanaConfiguracion = new ConfiguracionComedor();
+				VentanaConfiguracion.show();
+			});
+			mnConfiguracionIncidencias.setOnAction((e)->{
+				ConfiguracionIncidencias configuracion = new ConfiguracionIncidencias();
+				configuracion.show();
+			});
+			mnInfoIncidencias.setOnAction((e)->{
+				LayoutWindow VentanaReporteLayoutIncidencias = new LayoutWindow(4);
+				VentanaReporteLayoutIncidencias.show();
+			});
+			mnInfoComedor.setOnAction((e)->{
+				LayoutWindow VentanaReporteLayoutIncidencias = new LayoutWindow(3);
+				VentanaReporteLayoutIncidencias.show();
+			});
 		}
 		catch (IOException exception){
-			throw new RuntimeException(exception);
+			MessageController mensaje = new MessageController(stage);
+			mensaje.showMessage("Error en la aplicación: " + exception.getMessage(), 2);
 		}
 	}
 	private final Stage stage = new Stage();
@@ -45,62 +63,71 @@ public class Attendance extends AnchorPane{
 		stage.centerOnScreen();
 		stage.setTitle("Attendance");
 		stage.setResizable(true);
-		Task<Void> CargarPantallaEmpleados = new Task<Void>() {
+		Thread CargaPantallaEmpleados = new Thread(new Runnable() {
 			@Override
-			protected Void call() throws Exception {
-				IncrustaPanelEmpleados();
-				return null;
+			public void run() {
+				javafx.application.Platform.runLater(new Runnable() {
+                    public void run() {
+                    	IncrustaPanelEmpleados();
+                    	stage.show();
+                    }
+                });
 			}
-	    };
-	    Task<Void> CargarPantallaHorarios = new Task<Void>() {
+		});
+		Thread CargaPantallaHorarios = new Thread(new Runnable(){
 			@Override
-			protected Void call() throws Exception {
-				IncrustaPanelHorarios();
-				return null;
+			public void run() {
+				javafx.application.Platform.runLater(new Runnable() {
+                    public void run() {
+                    	IncrustaPanelHorarios();
+                    }
+                });
 			}
-	    };
-	    Task<Void> CargarPantallaComedores = new Task<Void>() {
+		});
+		Thread CargaPantallaComedores = new Thread(new Runnable(){
 			@Override
-			protected Void call() throws Exception {
-				IncrustaPanelReporteComedor();
-				return null;
+			public void run() {
+				javafx.application.Platform.runLater(new Runnable() {
+                    public void run() {
+                    	IncrustaPanelReporteComedor();
+                    }
+                });
 			}
-	    };
-	    Task<Void> CargarPantallaIncidencias = new Task<Void>() {
+		});
+		Thread CargaPantallaIncidencias = new Thread(new Runnable() {
 			@Override
-			protected Void call() throws Exception {
-				IncrustaPanelIncidencias();
-				return null;
+			public void run() {
+				javafx.application.Platform.runLater(new Runnable() {
+                    public void run() {
+                    	IncrustaPanelIncidencias();
+                    }
+                });
 			}
-	    };
-	    Task<Void> CargarPantallaAdministradores = new Task<Void>() {
+		});
+		Thread CargaPantallaUsuarios = new Thread(new Runnable(){
 			@Override
-			protected Void call() throws Exception {
-				IncrustaPanelUsuariosAdministradores();
-				return null;
+			public void run() {
+				javafx.application.Platform.runLater(new Runnable() {
+                    public void run() {
+                    	IncrustaPanelUsuariosAdministradores();
+                    }
+                });
 			}
-	    };
-		Thread Empleados = new Thread(CargarPantallaEmpleados);
-		Thread Horarios = new Thread(CargarPantallaHorarios);
-		Thread Comedores = new Thread(CargarPantallaComedores);
-		Thread Incidencias = new Thread(CargarPantallaIncidencias);
-		Thread Administradores = new Thread(CargarPantallaAdministradores);
-		Empleados.start();
-		Horarios.start();
-		Comedores.start();
-		Incidencias.start();
-		Administradores.start();
-		try{
-			Empleados.join();
-			Horarios.join();
-			Comedores.join();
-			Incidencias.join();
-			Administradores.join();
-			stage.show();
-		}
-		catch(Exception exc){
+		});
+		CargaPantallaHorarios.start();
+		CargaPantallaComedores.start();
+		CargaPantallaIncidencias.start();
+		CargaPantallaUsuarios.start();
+		CargaPantallaEmpleados.start();
+		try {
+			CargaPantallaEmpleados.join();
+			CargaPantallaHorarios.join();
+			CargaPantallaComedores.join();
+			CargaPantallaIncidencias.join();
+			CargaPantallaUsuarios.join();
+		} catch (Exception e) {
 			MessageController Mensaje = new MessageController(stage);
-			Mensaje.showMessage("Error al intentar cargar la aplicación: " + exc.getMessage(), 2);
+			Mensaje.showMessage("Error en la aplicación: " + e.getMessage(), 2);
 		}
 		
 	}
@@ -134,4 +161,8 @@ public class Attendance extends AnchorPane{
 	@FXML private StackPane spUsuariosAdministradores;
 	@FXML private MenuItem mnLayoutComedor;
 	@FXML private MenuItem mnLayoutIncidencias;
+	@FXML private MenuItem mnConfiguracionComedores;
+	@FXML private MenuItem mnConfiguracionIncidencias;
+	@FXML private MenuItem mnInfoIncidencias;
+	@FXML private MenuItem mnInfoComedor;
 }

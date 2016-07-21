@@ -23,11 +23,6 @@
                   <Insets left="10.0" top="10.0" />
                </StackPane.margin>
             </Label>
-            <Line endX="200.0" stroke="#008287" strokeWidth="1.5" StackPane.alignment="TOP_LEFT">
-               <StackPane.margin>
-                  <Insets left="10.0" top="38.0" />
-               </StackPane.margin>
-            </Line>
             <VBox spacing="10.0">
                <children>
                   <HBox alignment="CENTER_RIGHT" spacing="10.0">
@@ -54,9 +49,7 @@
                   </HBox>
                   <HBox alignment="CENTER_RIGHT" spacing="10.0">
                      <children>
-                        <Button fx:id="btnExcel" defaultButton="true" mnemonicParsing="false" onAction="#btnExcel_OnAction" text="Exportar Excel" textFill="WHITE" />
                         <Button fx:id="btnActualizaInformacion" mnemonicParsing="false" onAction="#btnActualizaInformacion_OnAction" text="Actualizar Información" />
-                        <Button fx:id="Configuracion" mnemonicParsing="false" onAction="#Configuracion_OnAction" text="Configuración" />
                      </children>
                   </HBox>
                </children>
