@@ -1,7 +1,5 @@
 package presentation.comedor;
 
-import java.io.IOException;
-
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.Configuracion;
 import org.tempuri.AttendanceServiceProxy;
 
@@ -13,7 +11,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
@@ -31,12 +28,11 @@ public class ConfiguracionComedor extends AnchorPane
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
-			LoadControls();
+			fxmlLoader.load();
 		}
-		catch (IOException exception){
-			throw new RuntimeException(exception);
+		catch (Exception exception){
+			MessageController mensaje = new MessageController(this.stage);
+			mensaje.showMessage("Error en la aplicación: " + exception.getMessage(), 2);
 		}
 	}
 	public void show()
@@ -45,8 +41,9 @@ public class ConfiguracionComedor extends AnchorPane
 		stage.setScene(new Scene(this));
 		stage.centerOnScreen();
 		stage.setTitle("Configuración Comedor");
-		stage.setResizable(true);
+		stage.setResizable(false);
 		stage.show();
+		LoadControls();
 	}
 	@FXML protected void btnCancelar_OnAction()
 	{

@@ -17,7 +17,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -47,8 +46,7 @@ public class DetalleComidas extends AnchorPane
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			setEmpleado(Entidad);
 			lblNumeroEmpleado.setText(Empleado.getNumeroEmpleado().toString());
 			lblNombreEmpleado.setText(Empleado.getNombreEmpleado().toUpperCase());
@@ -58,7 +56,6 @@ public class DetalleComidas extends AnchorPane
 			tcLugar.setCellValueFactory(new PropertyValueFactory<DetalleComida,String>("LugarRegistro"));
 			this.FechaInicio = FechaInicio;
 			this.FechaFin = FechaFin;
-			FillGrid();
 		}
 		catch (IOException exception){
 			throw new RuntimeException(exception);
@@ -71,6 +68,7 @@ public class DetalleComidas extends AnchorPane
 		stage.setTitle("Detalle de comidas");
 		stage.setResizable(true);
 		stage.show();
+		FillGrid();
 	}
 	@FXML Label lblNumeroEmpleado = new Label();
 	@FXML Label lblNombreEmpleado = new Label();

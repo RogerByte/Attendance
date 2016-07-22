@@ -1055,6 +1055,21 @@ namespace AttendanceCore.BusinessLogic
                 EslabonDA Eslabon = new EslabonDA();
                 Response = BaseDatos.ObtenerReporteIncidencias(NumeroEmpleado, NombreEmpleado, Compania, Nomina, FechaInicio, FechaFin);
                 List<DiasJustificados> Justificaciones = Eslabon.ObtenerDiasJustificados(FechaInicio, FechaFin);
+                List<ComplementoEmpleado> InformacionComplementaria = Eslabon.ObtenerInformacionComplementaria();
+                foreach (ReporteIncidencia registro in Response)
+                {
+                    foreach (ComplementoEmpleado complemento in InformacionComplementaria)
+                    {
+                        if (registro.EmpleadoId == complemento.EmpleadoId)
+                        {
+                            registro.ClaveCentroCostos = complemento.ClaveCentroCostos;
+                            registro.DescripcionCentroCostos = complemento.DescripcionCentroCostos;
+                            registro.Nomina = complemento.Nomina;
+                            registro.RazonSocial = complemento.RazonSocial;
+                            break;
+                        }
+                    }
+                }
                 foreach(DiasJustificados Justificacion in Justificaciones)
                 {
                     foreach(ReporteIncidencia Registro in Response)
@@ -1072,16 +1087,6 @@ namespace AttendanceCore.BusinessLogic
                         }
                     }
                 }
-
-                //foreach (ReporteIncidencia Registro in Response)
-                //{
-                //    //Registro.Fecha = Convert.ToDateTime(Registro.Fecha).ToString("dd/MM/yyyy");
-                //    if(Registro.Concepto.Contains("FALTA"))
-                //    {
-                //        if (Eslabon.GetJustificacion(Registro.EmpleadoId, Convert.ToDateTime(Registro.Fecha)))
-                //            Registro.Concepto = "FALTA JUSTIFICADA";
-                //    }
-                //}
             }
             catch(Exception exc)
             {

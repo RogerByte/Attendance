@@ -2,8 +2,6 @@ package presentation.empleados;
 import presentation.common.MessageController;
 import presentation.common.ProgressController;
 import presentation.common.entities.TaskResponse;
-
-import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 
@@ -15,8 +13,8 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -34,6 +32,9 @@ import javafx.util.Callback;
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.*;
 import org.tempuri.AttendanceServiceProxy;
 
+import com.sun.javafx.tk.FontLoader;
+import com.sun.javafx.tk.Toolkit;
+
 public class Empleados extends AnchorPane{
 	private Stage stage;
 	private Usuario usuario;
@@ -44,22 +45,23 @@ public class Empleados extends AnchorPane{
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			txtNombreEmpleado.setOnAction (e->{
 				FillGridEmpleados(txtNombreEmpleado.getText());
 			});
 			tcIdEmpleado.setCellValueFactory(new PropertyValueFactory<Empleado,String>("IEmpleadoId"));
 			tcNumeroEmpleado.setCellValueFactory(new PropertyValueFactory<Empleado,String>("NumeroEmpleado"));
-			tcNombreEmpleado.setCellValueFactory(new PropertyValueFactory<Empleado,String>("NombreEmpleado"));
-			tcCompania.setCellValueFactory(new PropertyValueFactory<Empleado,String>("Compania"));
-			tcNomina.setCellValueFactory(new PropertyValueFactory<Empleado,String>("Nomina"));
+			ColumnaNombreEmpleado();
+			ColumnaRazonSocial();
+			ColumnaNomina();
 			ColumnaEditar();
 			ColumnaEliminar();
 			ColumnaSincronizar();
+			//GridEmpleados.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 		}
-		catch (IOException exception){
-			throw new RuntimeException(exception);
+		catch (Exception exception){
+			MessageController mensaje = new MessageController(stage);
+			mensaje.showMessage("Error en la aplicación: " + exception.getMessage(), 2);
 		}
 	}
 	private ObservableList<Empleado> ListaEmpleados = FXCollections.observableArrayList();;
@@ -79,6 +81,9 @@ public class Empleados extends AnchorPane{
 	@FXML TableColumn<Empleado, String> tcCompania;
 	@FXML TableColumn<Empleado, String> tcNomina;
 	public void FillGridEmpleados(final String NombreEmpleado){
+		MaxNombreEmpleadoWidthValue = 0;
+		MaxNominaWidthValue = 0;
+		MaxRazonSocialWidthValue = 0;
 		final Task<TaskResponse> task = new Task<TaskResponse>(){
 		    @Override public TaskResponse call() throws InterruptedException{
 		    	TaskResponse Response = new TaskResponse();
@@ -130,7 +135,7 @@ public class Empleados extends AnchorPane{
 		});
 		
 		progress.showProgess(task);
-		new Thread(task).start();
+		javafx.application.Platform.runLater(task);
 	}
 	/**
 	 * Permite cargar el botón con icono dentro del Grid para Editar un Empleado en los dispositivos de reloj checador
@@ -172,6 +177,90 @@ public class Empleados extends AnchorPane{
 									mensaje.showMessage("Ocurrió un problema en la aplicación: " + exc.getMessage(), 2);
 								}
 							});
+						}
+						else {
+							setGraphic(null);
+						}
+					}
+				};
+				return cell;
+			}
+		});
+	}
+	double MaxNombreEmpleadoWidthValue = 0;
+	private void ColumnaNombreEmpleado(){
+		tcNombreEmpleado.setCellValueFactory(new PropertyValueFactory<Empleado,String>("NombreEmpleado"));
+		tcNombreEmpleado.setCellFactory(new Callback<TableColumn<Empleado, String>,TableCell<Empleado, String>>(){
+			@Override public TableCell<Empleado, String> call(TableColumn<Empleado, String> param){                
+				TableCell<Empleado, String> cell = new TableCell<Empleado, String>(){
+					@Override public void updateItem(String item, boolean empty){                        
+						if(item!=null){                            
+							final HBox box= new HBox();
+							Label NombreEmpleado = new Label(item);
+							box.getChildren().addAll(NombreEmpleado);
+							FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+							double width = fontLoader.computeStringWidth(NombreEmpleado.getText(), NombreEmpleado.getFont()) + 10;
+							if(MaxNombreEmpleadoWidthValue < width){
+								MaxNombreEmpleadoWidthValue = width;
+								tcNombreEmpleado.setMinWidth(MaxNombreEmpleadoWidthValue);
+							}
+							setGraphic(box);
+						}
+						else {
+							setGraphic(null);
+						}
+					}
+				};
+				return cell;
+			}
+		});
+	}
+	double MaxRazonSocialWidthValue = 0;
+	private void ColumnaRazonSocial(){
+		tcCompania.setCellValueFactory(new PropertyValueFactory<Empleado,String>("Compania"));
+		tcCompania.setCellFactory(new Callback<TableColumn<Empleado, String>,TableCell<Empleado, String>>(){
+			@Override public TableCell<Empleado, String> call(TableColumn<Empleado, String> param){                
+				TableCell<Empleado, String> cell = new TableCell<Empleado, String>(){
+					@Override public void updateItem(String item, boolean empty){                        
+						if(item!=null){                            
+							final HBox box= new HBox();
+							Label NombreEmpleado = new Label(item);
+							box.getChildren().addAll(NombreEmpleado);
+							FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+							double width = fontLoader.computeStringWidth(NombreEmpleado.getText(), NombreEmpleado.getFont()) + 10;
+							if(MaxRazonSocialWidthValue < width){
+								MaxRazonSocialWidthValue = width;
+								tcCompania.setMinWidth(MaxRazonSocialWidthValue);
+							}
+							setGraphic(box);
+						}
+						else {
+							setGraphic(null);
+						}
+					}
+				};
+				return cell;
+			}
+		});
+	}
+	double MaxNominaWidthValue = 0;
+	private void ColumnaNomina(){
+		tcNomina.setCellValueFactory(new PropertyValueFactory<Empleado,String>("Nomina"));
+		tcNomina.setCellFactory(new Callback<TableColumn<Empleado, String>,TableCell<Empleado, String>>(){
+			@Override public TableCell<Empleado, String> call(TableColumn<Empleado, String> param){                
+				TableCell<Empleado, String> cell = new TableCell<Empleado, String>(){
+					@Override public void updateItem(String item, boolean empty){                        
+						if(item!=null){                            
+							final HBox box= new HBox();
+							Label NombreEmpleado = new Label(item);
+							box.getChildren().addAll(NombreEmpleado);
+							FontLoader fontLoader = Toolkit.getToolkit().getFontLoader();
+							double width = fontLoader.computeStringWidth(NombreEmpleado.getText(), NombreEmpleado.getFont()) + 10;
+							if(MaxNominaWidthValue < width){
+								MaxNominaWidthValue = width;
+								tcNomina.setMinWidth(MaxNominaWidthValue);
+							}
+							setGraphic(box);
 						}
 						else {
 							setGraphic(null);

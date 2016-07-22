@@ -4,6 +4,7 @@ import presentation.common.MessageController;
 import presentation.common.ProgressController;
 import presentation.common.entities.*;
 
+import org.controlsfx.control.textfield.TextFields;
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.Empleado;
 import org.tempuri.AttendanceServiceProxy;
 
@@ -11,7 +12,6 @@ import ResponseContracts.AttendanceService.ServiceMessage;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -20,7 +20,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
@@ -67,8 +66,7 @@ public class AltaEmpleado extends AnchorPane{
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			InitializeComponents();
 		}
 		catch (IOException exception){
@@ -112,44 +110,45 @@ public class AltaEmpleado extends AnchorPane{
 	}
 	private void InitializeComponents(){
 		MessageController Mensaje = new MessageController(stage);
-		ArrayList<Catalogo> CatalogoHorarios = new ArrayList<Catalogo>();
-		ArrayList<Catalogo> CatalogoEmpleados = new ArrayList<Catalogo>();
-		ArrayList<Catalogo> CatalogoManagers = new ArrayList<Catalogo>();
+		
 		AttendanceServiceProxy Servicio = new AttendanceServiceProxy();
 		//Cargar el catalogo de Empleados:
 		try {
+			ObservableList<Catalogo> ListaHorarios = FXCollections.observableArrayList();
 			org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Horarios  = Servicio.obtenerCatalogoHorarios();
 			if(Horarios.length > 0){
 				for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo Horario : Horarios){
 					Catalogo catalogo = new Catalogo(Horario.getId(), Horario.getDescripcion());
-					CatalogoHorarios.add(catalogo);
+					ListaHorarios.add(catalogo);
 				}
 			}
-			ObservableList<Catalogo> ListaHorarios = FXCollections.observableArrayList(CatalogoHorarios);
 			cmbHorario.getItems().addAll(ListaHorarios);
 			
+			ObservableList<Catalogo> ListaEmpleados = FXCollections.observableArrayList();
 			org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Empleados  = Servicio.obtenerCatalogoEmpleados();
 			if(Horarios.length > 0){
 				for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo Empleado : Empleados){
 					Catalogo catalogo = new Catalogo(Empleado.getId(), Empleado.getDescripcion());
-					CatalogoEmpleados.add(catalogo);
+					ListaEmpleados.add(catalogo);
 				}
 			}
-			ObservableList<Catalogo> ListaEmpleados = FXCollections.observableArrayList(CatalogoEmpleados);
 			cmbEmpleados.getItems().addAll(ListaEmpleados);
 			
+			ObservableList<Catalogo> ListaManagers = FXCollections.observableArrayList();
 			org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Managers  = Servicio.catalogoManagers();
 			if(Horarios.length > 0){
 				for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo Manager : Managers){
 					Catalogo catalogo = new Catalogo(Manager.getId(), Manager.getDescripcion());
-					CatalogoManagers.add(catalogo);
+					ListaManagers.add(catalogo);
 				}
 			}
-			ObservableList<Catalogo> ListaManagers = FXCollections.observableArrayList(CatalogoManagers);
 			cmbManagers.getItems().addAll(ListaManagers);
 			
-			new AutoCompleteComboBoxListener(cmbEmpleados);
-			new AutoCompleteComboBoxListener(cmbManagers);
+			cmbEmpleados.setEditable(true);
+			TextFields.bindAutoCompletion(cmbEmpleados.getEditor(), cmbEmpleados.getItems());
+			cmbManagers.setEditable(true);
+			TextFields.bindAutoCompletion(cmbManagers.getEditor(), cmbManagers.getItems());
+			
 			cmbEmpleados.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {

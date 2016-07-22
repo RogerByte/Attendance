@@ -1,8 +1,5 @@
 package presentation.horarios;
-
-import java.io.IOException;
 import java.rmi.RemoteException;
-
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.*;
 import org.tempuri.AttendanceServiceProxy;
 
@@ -10,6 +7,7 @@ import ResponseContracts.AttendanceService.EliminaHorarioResponse;
 import presentation.common.MessageController;
 import presentation.common.ProgressController;
 import presentation.common.entities.TaskResponse;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -17,7 +15,6 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -42,8 +39,7 @@ public class Horarios extends AnchorPane{
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			tcIdHorario.setCellValueFactory(new PropertyValueFactory<Horario,String>("HorarioId"));
 			tcDescripcionHoriario.setCellValueFactory(new PropertyValueFactory<Horario,String>("DescripcionHorario"));
 			ColumnaEditar();
@@ -56,8 +52,9 @@ public class Horarios extends AnchorPane{
 			ColumnaSabado();
 			ColumnaDomingo();
 		}
-		catch (IOException exception){
-			throw new RuntimeException(exception);
+		catch (Exception exception){
+			MessageController mensaje = new MessageController(stage);
+			mensaje.showMessage("Error en la aplicación: " + exception.getMessage(), 2);
 		}
 	}
 	
@@ -125,7 +122,7 @@ public class Horarios extends AnchorPane{
 			}
 		});
 		progress.showProgess(task);
-		new Thread(task).start();
+		Platform.runLater(task);
 	}
 	private void ColumnaLunes(){
 		tcLunes.setCellValueFactory(new PropertyValueFactory<Horario,String>("HorarioLunes"));

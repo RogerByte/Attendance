@@ -1,7 +1,6 @@
 package presentation.common;
 import java.io.IOException;
 import java.net.URL;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -30,8 +29,7 @@ public class MessageController extends AnchorPane
 		fxmlLoader.setRoot(this);
 		fxmlLoader.setController(this);
 		try	{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 			btnCancelar.setOnAction(e->{stage.close();});
 			btnSalir.setOnAction(e->{stage.close();});
 		}
@@ -64,7 +62,10 @@ public class MessageController extends AnchorPane
 	/**
 	 * @author Lázaro Adrián González Montoya
 	 * @param Mensaje Mensaje para mostrar en la ventana
-	 * @param config 1 - Correcto, 2 - Error, 3 - Pregunta
+	 * @param config <br>
+	 * 1 - Correcto <br>
+	 * 2 - Error <br>
+	 * 3 - Warning <br>
 	 */
 	public void showMessage(String Mensaje, int config)	{
 		loadComponent();

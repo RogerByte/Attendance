@@ -12,7 +12,6 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.PasswordField;
@@ -47,8 +46,7 @@ public class LoginController extends AnchorPane
 		fxmlLoader.setController(this);
 		try
 		{
-			Parent root = (Parent)fxmlLoader.load();
-			root.getStylesheets().add(this.getClass().getResource("/presentation/common/Images/JMetroLightTheme.css").toExternalForm());
+			fxmlLoader.load();
 		}
 		catch (IOException exception)
 		{
@@ -90,6 +88,8 @@ public class LoginController extends AnchorPane
 			    @Override public TaskResponse call() throws InterruptedException{
 			    	TaskResponse response = new TaskResponse();
 					try{
+						btnIngresar.setDisable(true);
+						btnCancelar.setDisable(true);
 						setUsuario(ValidaUsuario(txtUsuario.getText(), txtPassword.getText()));
 						if (getUsuario().getIdUsuario() == null)
 							throw new Exception("Error de comunicación con el servicio Attendance");
@@ -125,8 +125,9 @@ public class LoginController extends AnchorPane
 						Attendance main = new Attendance(stage, usuario);
 						close();
 						main.show();
-						
 					}
+					btnIngresar.setDisable(false);
+					btnCancelar.setDisable(false);
 				}
 			});
 			task.setOnFailed(new EventHandler<WorkerStateEvent>(){
@@ -142,8 +143,9 @@ public class LoginController extends AnchorPane
 						Attendance main = new Attendance(stage, usuario);
 						close();
 						main.show();
-						
 					}
+					btnCancelar.setDisable(false);
+					btnCancelar.setDisable(false);
 				}
 			});
 			progress.showProgess(task);
