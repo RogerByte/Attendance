@@ -4,7 +4,6 @@ import presentation.common.MessageController;
 import presentation.common.ProgressController;
 import presentation.common.entities.*;
 
-import org.controlsfx.control.textfield.TextFields;
 import org.datacontract.schemas._2004._07.AttendanceCore_Entities.Empleado;
 import org.tempuri.AttendanceServiceProxy;
 
@@ -12,7 +11,9 @@ import ResponseContracts.AttendanceService.ServiceMessage;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -110,45 +111,44 @@ public class AltaEmpleado extends AnchorPane{
 	}
 	private void InitializeComponents(){
 		MessageController Mensaje = new MessageController(stage);
-		
+		ArrayList<Catalogo> CatalogoHorarios = new ArrayList<Catalogo>();
+		ArrayList<Catalogo> CatalogoEmpleados = new ArrayList<Catalogo>();
+		ArrayList<Catalogo> CatalogoManagers = new ArrayList<Catalogo>();
 		AttendanceServiceProxy Servicio = new AttendanceServiceProxy();
 		//Cargar el catalogo de Empleados:
 		try {
-			ObservableList<Catalogo> ListaHorarios = FXCollections.observableArrayList();
 			org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Horarios  = Servicio.obtenerCatalogoHorarios();
 			if(Horarios.length > 0){
 				for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo Horario : Horarios){
 					Catalogo catalogo = new Catalogo(Horario.getId(), Horario.getDescripcion());
-					ListaHorarios.add(catalogo);
+					CatalogoHorarios.add(catalogo);
 				}
 			}
+			ObservableList<Catalogo> ListaHorarios = FXCollections.observableArrayList(CatalogoHorarios);
 			cmbHorario.getItems().addAll(ListaHorarios);
 			
-			ObservableList<Catalogo> ListaEmpleados = FXCollections.observableArrayList();
 			org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Empleados  = Servicio.obtenerCatalogoEmpleados();
 			if(Horarios.length > 0){
 				for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo Empleado : Empleados){
 					Catalogo catalogo = new Catalogo(Empleado.getId(), Empleado.getDescripcion());
-					ListaEmpleados.add(catalogo);
+					CatalogoEmpleados.add(catalogo);
 				}
 			}
+			ObservableList<Catalogo> ListaEmpleados = FXCollections.observableArrayList(CatalogoEmpleados);
 			cmbEmpleados.getItems().addAll(ListaEmpleados);
 			
-			ObservableList<Catalogo> ListaManagers = FXCollections.observableArrayList();
 			org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo [] Managers  = Servicio.catalogoManagers();
 			if(Horarios.length > 0){
 				for(org.datacontract.schemas._2004._07.AttendanceCore_Entities.Catalogo Manager : Managers){
 					Catalogo catalogo = new Catalogo(Manager.getId(), Manager.getDescripcion());
-					ListaManagers.add(catalogo);
+					CatalogoManagers.add(catalogo);
 				}
 			}
+			ObservableList<Catalogo> ListaManagers = FXCollections.observableArrayList(CatalogoManagers);
 			cmbManagers.getItems().addAll(ListaManagers);
 			
-			cmbEmpleados.setEditable(true);
-			TextFields.bindAutoCompletion(cmbEmpleados.getEditor(), cmbEmpleados.getItems());
-			cmbManagers.setEditable(true);
-			TextFields.bindAutoCompletion(cmbManagers.getEditor(), cmbManagers.getItems());
-			
+			new AutoCompleteComboBoxListener(cmbEmpleados);
+			new AutoCompleteComboBoxListener(cmbManagers);
 			cmbEmpleados.setOnMouseClicked(new EventHandler<MouseEvent>() {
 				@Override
 				public void handle(MouseEvent arg0) {
@@ -228,21 +228,26 @@ public class AltaEmpleado extends AnchorPane{
 	private Empleado ObtenEntidad()
 	{
 		Empleado empleado = new Empleado();
-		if(!AltaEmpleado){
-			empleado = getEmpleado();
+		try{
+			if(!AltaEmpleado){
+				empleado = getEmpleado();
+			}
+			Catalogo entidad = cmbEmpleados.getItems().get(cmbEmpleados.getSelectionModel().getSelectedIndex());
+			empleado.setIEmpleadoId(entidad.id);
+			empleado.setNombreEmpleado(entidad.displayString);
+			empleado.setNumeroTarjeta(txtNumTarjeta.getText());
+			entidad = cmbHorario.getItems().get(cmbHorario.getSelectionModel().getSelectedIndex());
+			empleado.setHorarioId(entidad.id);
+			empleado.setNombreUsuario(txtNombreUsuario.getText());
+			empleado.setPasswordAttendance(txtPassword.getText());
+			empleado.setCorreoElectronico(txtCorreo.getText());
+			Catalogo manager = cmbManagers.getItems().get(cmbManagers.getSelectionModel().getSelectedIndex());
+			empleado.setManagerId(manager.id);
+			empleado.setEsManager(chkIsManager.isSelected());
 		}
-		Catalogo entidad = cmbEmpleados.getItems().get(cmbEmpleados.getSelectionModel().getSelectedIndex());
-		empleado.setIEmpleadoId(entidad.id);
-		empleado.setNombreEmpleado(entidad.displayString);
-		empleado.setNumeroTarjeta(txtNumTarjeta.getText());
-		entidad = cmbHorario.getItems().get(cmbHorario.getSelectionModel().getSelectedIndex());
-		empleado.setHorarioId(entidad.id);
-		empleado.setNombreUsuario(txtNombreUsuario.getText());
-		empleado.setPasswordAttendance(txtPassword.getText());
-		empleado.setCorreoElectronico(txtCorreo.getText());
-		Catalogo manager = cmbManagers.getItems().get(cmbManagers.getSelectionModel().getSelectedIndex());
-		empleado.setManagerId(manager.id);
-		empleado.setEsManager(chkIsManager.isSelected());
+		catch(Exception exc){
+			System.out.println(exc.getMessage());
+		}
 		return empleado;
 	}
 	@FXML ComboBox<Catalogo> cmbEmpleados = new ComboBox<Catalogo>();
@@ -339,7 +344,7 @@ public class AltaEmpleado extends AnchorPane{
 				}
 			});
 			progress.showProgess(task);
-			new Thread(task).start();
+			Platform.runLater(task);
 		}
 	}
 }
