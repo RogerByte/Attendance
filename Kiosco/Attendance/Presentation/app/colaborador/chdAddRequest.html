@@ -1,0 +1,59 @@
+﻿<md-dialog id="requestDialog" aria-label="Agregar Solicitud" ng-cloak>
+    <form name="RequestForm" >
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Agregar Solicitud</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" ng-click="cancel()">
+                    <md-icon md-svg-src="Presentation/assets/ic_close_24px.svg" aria-label="Close dialog"></md-icon>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content>
+            <div class="md-dialog-content" layout="column" layout-align="center stretch">
+                <p>Ingrese la siguiente información para agregar una solicitud nueva</p>
+                <md-input-container style="width:200px;">
+                    <label>Tipo de solicitud</label>
+                    <md-select ng-model="solicitud.requestType" name="requestType" required>
+                        <md-option ng-repeat="tipoSolicitud in requestTypes" value="{{tipoSolicitud.value}}">
+                            {{tipoSolicitud.display}}
+                        </md-option>
+                    </md-select>
+                    <div class="errors" ng-messages="RequestForm.requestType.$error">
+                        <div ng-message="required">Seleccionar tipo de solicitud</div>
+                    </div>
+                </md-input-container>
+                <div style="margin:10px;" layout="column" layout-align="center stretch">
+                    <div layout="row">
+                        <md-datepicker ng-model="solicitud.fechaInicio" md-placeholder="Fecha Inicio" name="fechaInicio" md-is-error="RequestForm.fechaInicio.$invalid && isFechaIniciValid(RequestForm.fechaInicio, RequestForm.fechaFin)" required>
+                        </md-datepicker>
+                        <div style="font-size: 12px;
+                                color: #dd2c00;
+                                margin: 10px 0 0 25px;" ng-messages="RequestForm.fechaInicio.$error" layout="row">
+                            <div ng-message="valid">El valor de fecha no es válido</div>
+                            <div ng-message="required">Requerido</div>
+                        </div>
+                    </div>
+                    <div layout="row">
+                        <md-datepicker ng-model="solicitud.fechaFin" md-placeholder="Fecha Fin" name="fechaFin" required>
+                        </md-datepicker>
+                        <div style="font-size: 12px;
+                                color: #dd2c00;
+                                margin: 10px 0 0 25px;" ng-messages="RequestForm.fechaFin.$error" layout="row">
+                            <div ng-message="valid">El valor de fecha no es válido</div>
+                            <div ng-message="required">Requerido</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button ng-click="cancel()">
+                Cancelar
+            </md-button>
+            <md-button class="md-raised md-primary" style="margin-right:20px;" type="submit" ng-disabled="RequestForm.$invalid" ng-click="EnviarSolicitud(solicitud)">
+                Enviar Solicitud
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

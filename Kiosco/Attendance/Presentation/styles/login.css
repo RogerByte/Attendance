@@ -1,0 +1,22 @@
+﻿body {
+
+}
+html > body header {
+	color: rgb(255,255,255);
+	text-align: center;
+	background-size: cover;
+	background-position: center;
+	padding: 10px 0 10px 0;
+}
+.saldoinferior {
+    margin-top:2px;
+    font-family:Consolas;
+    font-size:15px;
+    color:#ff0000;
+}
+.saldopositivo {
+    margin-top:3px;
+    font-family:Consolas;
+    font-size:15px;
+    color:#40b412;
+}

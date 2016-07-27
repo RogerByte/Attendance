@@ -1,0 +1,49 @@
+﻿<div layout="column" layout-align="space-around stretch">
+    <md-card>
+        <md-card-title>
+            <md-card-title-text>
+                <span class="md-headline">{{Colaborador.Nombre}}</span>
+                <span class="md-subhead">{{Colaborador.Puesto}}</span>
+                <div layout="row">
+                    <span class="md-subhead">Saldo Vacacional:</span>
+                    <span ng-class="[{saldopositivo : Colaborador.SaldoVacacional > 0 }, {saldoinferior : Colaborador.SaldoVacacional < 1 }]">&nbsp;{{Colaborador.SaldoVacacional}}</span>
+                </div>
+            </md-card-title-text>
+            <md-card-title-media>
+                <div class="md-media-sm card-media"></div>
+            </md-card-title-media>
+        </md-card-title>
+        <md-card-actions layout="row" layout-align="end center">
+        </md-card-actions>
+    </md-card>
+    <div flex-gt-sm="50" flex>
+        <md-toolbar class="md-hue-2">
+            <div class="md-toolbar-tools" layout="row" layout-align="space-between center">
+                <h2>
+                    <span>Solicitudes</span>
+                </h2>
+                <div>
+                    <md-button aria-label="Solicitar" ng-click="showAdvanced($event)">
+                        Agregar solicitud
+                    </md-button>
+                    <md-button class="md-icon-button md-primary" aria-label="refrescar" ng-click="ActualizarListaSolicitudes()">
+                        <md-icon md-svg-icon="Presentation/assets/refresh.svg"></md-icon>
+                    </md-button>
+                </div>
+            </div>
+        </md-toolbar>
+        <md-content>
+            <md-list class="md-dense" flex>
+                <md-subheader class="md-no-sticky">Incidencias</md-subheader>
+                <md-list-item class="md-3-line" ng-repeat="incidencia in Incidencias">
+                    <img ng-src="{{incidencia.icono}}?{{$index}}" class="md-avatar" alt="{{incidencia.id}}" />
+                    <div class="md-list-item-text" layout="column">
+                        <h3>{{ incidencia.descripcion }}</h3>
+                        <h4>{{ incidencia.estatus }}</h4>
+                        <p>{{ incidencia.periodo }}</p>
+                    </div>
+                </md-list-item>
+            </md-list>
+        </md-content>
+    </div>
+</div>

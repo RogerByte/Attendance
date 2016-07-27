@@ -1,0 +1,15 @@
+<form name="loginForm" md-theme="default" class="md-primary" ng-submit="login()" novalidate layout="column" layout-align="center center" style="padding: 20px;">
+    <md-input-container flex class="md-icon-float">
+        <label for="username">Usuario:</label>
+        <md-icon md-svg-src="Presentation/assets/ic_account_circle_black_24px.svg" class="name"></md-icon>
+        <input type="text" id="username" ng-model="credentials.username" ng-disabled="dataLoading">
+    </md-input-container>
+    <md-input-container flex class="md-icon-float">
+        <label for="password">Contrase&ntilde;a:</label>
+        <md-icon md-svg-src="Presentation/assets/ic_lock_black_24px.svg" class="name"></md-icon>
+        <input type="password" id="password" ng-model="credentials.password" ng-disabled="dataLoading">
+    </md-input-container>
+    <md-input-container flex>
+        <md-button class="md-raised md-primary" type="submit" ng-disabled="dataLoading">Ingresar</md-button>
+    </md-input-container>
+</form>

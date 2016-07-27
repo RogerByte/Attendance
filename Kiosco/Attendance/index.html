@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html ng-app="attendance">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Attendance</title>
+    <link rel="stylesheet" href="Presentation/styles/angular-material.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:300,400,500,700,400italic">
+    <link rel="stylesheet" href="Presentation/styles/login.css">
+    <meta name="viewport" content="initial-scale=1" />
+</head>
+<body style="margin: 0 auto; background-image: url('Presentation/assets/FFM_HEXAGONOS.jpg'); background-size: cover; background-position: center;">
+    <header class="md-display-2" style="background-image: url('Presentation/assets/lollipop-green.jpg');  padding: 10px 0 10px 0; height:100px;" layout="row" layout-align="space-between center">
+        <div layout="column" layout-align="left center">
+            <img src="Presentation/assets/FFM_LOGO_BLANCO.png" style="width:150px; height:auto; padding-top:0; margin: -10px 0 0 5px;" />
+            <p style="width:200px; height:50px; font-size:15px; margin:-10px 0 -15px -18px;">Sistema Attendance</p>
+        </div>
+        <md-button href="#/login" ng-if="logeado">log out</md-button>
+    </header>
+    <md-content id="contenedor" ng-view style="padding-bottom:0; margin-bottom: 0;"></md-content>
+    <md-progress-linear ng-if="dataLoading" md-mode="indeterminate" style="padding-top: 0; margin-top:-10px; padding-bottom:10px;"></md-progress-linear>
+    <script src="Presentation/scripts/angular.js"></script>
+    <script src="Presentation/scripts/angular-animate.min.js"></script>
+    <script src="Presentation/scripts/angular-route.min.js"></script>
+    <script src="Presentation/scripts/angular-aria.min.js"></script>
+    <script src="Presentation/scripts/angular-messages.min.js"></script>
+    <script src="Presentation/scripts/angular-cookies.min.js"></script>
+    <script src="Presentation/scripts/angular-material.min.js"></script>
+    <script src="Presentation/scripts/jquery-1.11.3.min.js"></script>
+    <script src="Presentation/app/app.js"></script>
+    <script src="Presentation/app/login/services.js"></script>
+    <script src="Presentation/app/login/controllers.js"></script>
+    <script src="Presentation/app/home/services.js"></script>
+    <script src="Presentation/app/home/controllers.js"></script>
+</body>
+</html>
