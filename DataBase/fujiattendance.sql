@@ -2,7 +2,7 @@ CREATE DATABASE  IF NOT EXISTS `fujiattendance` /*!40100 DEFAULT CHARACTER SET u
 USE `fujiattendance`;
 -- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
--- Host: 192.168.1.22    Database: fujiattendance
+-- Host: x    Database: fujiattendance
 -- ------------------------------------------------------
 -- Server version	5.6.19
 
@@ -383,57 +383,108 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetDetalleFaltas`(Empleado INT, FI DATETIME, FF DATETIME )
-BEGIN
-  DECLARE FechaInicio DATE default '20150401';
-  DECLARE FechaFin DATE default '20150430';
-  DECLARE DIAS_RESTANTES INT default 0;
-  DECLARE CONTADOR_DIA DATE default FechaInicio;
-  DECLARE int_val INT DEFAULT 0;
-  IF FF <= CURDATE() THEN
-	SET FechaFin = FF;
-  else
-	SET FechaFin = CURDATE();
-  END IF;
-  SET FechaInicio = FI;
-  SET DIAS_RESTANTES = datediff(FechaFin, FechaInicio);
-  SET CONTADOR_DIA = FechaInicio;
-  DROP TABLE IF EXISTS TEMP;
-  CREATE TEMPORARY TABLE TEMP (FECHA DATE, NOMBRE_DIA VARCHAR(10));
-  
-  test_loop : LOOP
-    IF (int_val = DIAS_RESTANTES + 1) THEN
-      LEAVE test_loop;
-    END IF;
-    IF (SELECT COUNT(*) FROM diasfestivos WHERE FechaFestiva = CONTADOR_DIA AND Activo = 1) = 0 THEN
-      INSERT INTO TEMP (FECHA, NOMBRE_DIA) VALUES (CONTADOR_DIA, DATE_FORMAT(CONTADOR_DIA, '%W'));
-    END IF;
-    SET CONTADOR_DIA = DATE_ADD(CONTADOR_DIA ,INTERVAL 1 DAY);
-    SET int_val = int_val + 1;
-  END LOOP;  
-    SELECT EM.iEmpleadoId,
-		   EM.iNumeroEmpleado,
-           EM.vchNombreEmpleado,
-		   EM.vchCompania,
-		   EM.vchNomina,
-           T.FECHA
-      FROM Empleados EM
-INNER JOIN TEMP T ON T.FECHA = T.FECHA
-INNER JOIN Horarios H ON H.iHorarioId = EM.iHorarioId
- LEFT JOIN (  SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Coorporativo COR INNER JOIN Empleados E ON E.iEmpleadoId = COR.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
-              UNION
-              SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Cedis CED INNER JOIN Empleados E ON E.iEmpleadoId = CED.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
-           )  AS Asistencias ON DATE(Asistencias.FechaRegistro) = DATE(T.FECHA) AND EM.iEmpleadoId = Asistencias.iEmpleadoId
-     WHERE EM.bExterno = 0
-       AND EM.Activo = 1
-	   AND EM.iEmpleadoId = Empleado
-       AND (CASE WHEN H.bLunes = 0 AND T.NOMBRE_DIA = 'Monday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bMartes = 0 AND T.NOMBRE_DIA = 'Tuesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bMiercoles = 0 AND T.NOMBRE_DIA = 'Wednesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bJueves = 0 AND T.NOMBRE_DIA = 'Thursday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bViernes = 0 AND T.NOMBRE_DIA = 'Friday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bSabado = 0 AND T.NOMBRE_DIA = 'Saturday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bDomingo = 0 AND T.NOMBRE_DIA = 'Sunday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND Asistencias.DIA IS NULL;
+BEGIN
+
+  DECLARE FechaInicio DATE default '20150401';
+
+  DECLARE FechaFin DATE default '20150430';
+
+  DECLARE DIAS_RESTANTES INT default 0;
+
+  DECLARE CONTADOR_DIA DATE default FechaInicio;
+
+  DECLARE int_val INT DEFAULT 0;
+
+  IF FF <= CURDATE() THEN
+
+	SET FechaFin = FF;
+
+  else
+
+	SET FechaFin = CURDATE();
+
+  END IF;
+
+  SET FechaInicio = FI;
+
+  SET DIAS_RESTANTES = datediff(FechaFin, FechaInicio);
+
+  SET CONTADOR_DIA = FechaInicio;
+
+  DROP TABLE IF EXISTS TEMP;
+
+  CREATE TEMPORARY TABLE TEMP (FECHA DATE, NOMBRE_DIA VARCHAR(10));
+
+  
+
+  test_loop : LOOP
+
+    IF (int_val = DIAS_RESTANTES + 1) THEN
+
+      LEAVE test_loop;
+
+    END IF;
+
+    IF (SELECT COUNT(*) FROM diasfestivos WHERE FechaFestiva = CONTADOR_DIA AND Activo = 1) = 0 THEN
+
+      INSERT INTO TEMP (FECHA, NOMBRE_DIA) VALUES (CONTADOR_DIA, DATE_FORMAT(CONTADOR_DIA, '%W'));
+
+    END IF;
+
+    SET CONTADOR_DIA = DATE_ADD(CONTADOR_DIA ,INTERVAL 1 DAY);
+
+    SET int_val = int_val + 1;
+
+  END LOOP;  
+
+    SELECT EM.iEmpleadoId,
+
+		   EM.iNumeroEmpleado,
+
+           EM.vchNombreEmpleado,
+
+		   EM.vchCompania,
+
+		   EM.vchNomina,
+
+           T.FECHA
+
+      FROM Empleados EM
+
+INNER JOIN TEMP T ON T.FECHA = T.FECHA
+
+INNER JOIN Horarios H ON H.iHorarioId = EM.iHorarioId
+
+ LEFT JOIN (  SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Coorporativo COR INNER JOIN Empleados E ON E.iEmpleadoId = COR.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
+
+              UNION
+
+              SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Cedis CED INNER JOIN Empleados E ON E.iEmpleadoId = CED.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
+
+           )  AS Asistencias ON DATE(Asistencias.FechaRegistro) = DATE(T.FECHA) AND EM.iEmpleadoId = Asistencias.iEmpleadoId
+
+     WHERE EM.bExterno = 0
+
+       AND EM.Activo = 1
+
+	   AND EM.iEmpleadoId = Empleado
+
+       AND (CASE WHEN H.bLunes = 0 AND T.NOMBRE_DIA = 'Monday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bMartes = 0 AND T.NOMBRE_DIA = 'Tuesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bMiercoles = 0 AND T.NOMBRE_DIA = 'Wednesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bJueves = 0 AND T.NOMBRE_DIA = 'Thursday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bViernes = 0 AND T.NOMBRE_DIA = 'Friday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bSabado = 0 AND T.NOMBRE_DIA = 'Saturday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bDomingo = 0 AND T.NOMBRE_DIA = 'Sunday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND Asistencias.DIA IS NULL;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -450,84 +501,161 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetDetalleRetardos`(
-EmployerId INT,
-FI DATETIME,
-FF DATETIME
+CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetDetalleRetardos`(
+
+EmployerId INT,
+
+FI DATETIME,
+
+FF DATETIME
+
 )
-BEGIN
-  IF FF >= CURDATE() THEN
-	SET FF = CURDATE();
-  END IF;
-SELECT IEmpleadoId AS EmpleadoId,
-	   iNumeroEmpleado AS NumeroEmpleado, 
-	   vchNombreEmpleado AS NombreEmpleado, 
-	   FechaRegistro AS FechaRetardo,
-     Date_format(FechaRegistro, '%d/%m/%Y') AS Dia
-       FROM (
-SELECT EM.iEmpleadoId,
-		   EM.iNumeroEmpleado, 
-		   EM.vchNombreEmpleado,
-		   COR.FechaRegistro AS FechaRegistro,
-		   DAY(COR.FechaRegistro) AS Dia,
-		   DATE_FORMAT(COR.FechaRegistro, '%W') AS NomDia,
-		   DATE_FORMAT(COR.FechaRegistro, '%H:%i') AS HoraEntrada,
-		   CASE 
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   ELSE	'IGNORADO'
-		   END AS Retardo
-	  FROM Entrada_coorporativo COR
-INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
-INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
-	 WHERE EM.Activo = 1 
-	   AND EM.bExterno = 0
-	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
-  GROUP BY Dia, NomDia, iEmpleadoId
-UNION
-SELECT EM.iEmpleadoId,
-		   EM.iNumeroEmpleado, 
-		   EM.vchNombreEmpleado,
-		   COR.FechaRegistro AS FechaRegistro,
-		   DAY(COR.FechaRegistro) AS Dia,
-		   DATE_FORMAT(COR.FechaRegistro, '%W') AS NomDia,
-		   DATE_FORMAT(COR.FechaRegistro, '%H:%i') AS HoraEntrada,
-		   CASE 
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   ELSE	'IGNORADO'
-		   END AS Retardo
-	  FROM Entrada_cedis COR
-INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
-INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
-	 WHERE EM.Activo = 1 
-	   AND EM.bExterno = 0
-	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
-  GROUP BY Dia, NomDia, iEmpleadoId ) AS A WHERE Retardo = 'RETARDO' AND iEmpleadoId = EmployerId GROUP BY Dia;
+BEGIN
+
+  IF FF >= CURDATE() THEN
+
+	SET FF = CURDATE();
+
+  END IF;
+
+SELECT IEmpleadoId AS EmpleadoId,
+
+	   iNumeroEmpleado AS NumeroEmpleado, 
+
+	   vchNombreEmpleado AS NombreEmpleado, 
+
+	   FechaRegistro AS FechaRetardo,
+
+     Date_format(FechaRegistro, '%d/%m/%Y') AS Dia
+
+       FROM (
+
+SELECT EM.iEmpleadoId,
+
+		   EM.iNumeroEmpleado, 
+
+		   EM.vchNombreEmpleado,
+
+		   COR.FechaRegistro AS FechaRegistro,
+
+		   DAY(COR.FechaRegistro) AS Dia,
+
+		   DATE_FORMAT(COR.FechaRegistro, '%W') AS NomDia,
+
+		   DATE_FORMAT(COR.FechaRegistro, '%H:%i') AS HoraEntrada,
+
+		   CASE 
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   ELSE	'IGNORADO'
+
+		   END AS Retardo
+
+	  FROM Entrada_coorporativo COR
+
+INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
+
+INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
+
+	 WHERE EM.Activo = 1 
+
+	   AND EM.bExterno = 0
+
+	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
+
+  GROUP BY Dia, NomDia, iEmpleadoId
+
+UNION
+
+SELECT EM.iEmpleadoId,
+
+		   EM.iNumeroEmpleado, 
+
+		   EM.vchNombreEmpleado,
+
+		   COR.FechaRegistro AS FechaRegistro,
+
+		   DAY(COR.FechaRegistro) AS Dia,
+
+		   DATE_FORMAT(COR.FechaRegistro, '%W') AS NomDia,
+
+		   DATE_FORMAT(COR.FechaRegistro, '%H:%i') AS HoraEntrada,
+
+		   CASE 
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   ELSE	'IGNORADO'
+
+		   END AS Retardo
+
+	  FROM Entrada_cedis COR
+
+INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
+
+INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
+
+	 WHERE EM.Activo = 1 
+
+	   AND EM.bExterno = 0
+
+	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
+
+  GROUP BY Dia, NomDia, iEmpleadoId ) AS A WHERE Retardo = 'RETARDO' AND iEmpleadoId = EmployerId GROUP BY Dia;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -545,10 +673,14 @@ DELIMITER ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetDiasFeriados`()
-BEGIN
-  DECLARE ANIO VARCHAR(5) DEFAULT '2015';
-  SET ANIO = YEAR(CURRENT_DATE());
-	SELECT iDiaFestivoId, vchDescripcion, FechaFestiva FROM diasfestivos WHERE FechaFestiva > CONCAT(ANIO, '0101') AND Activo = 1;
+BEGIN
+
+  DECLARE ANIO VARCHAR(5) DEFAULT '2015';
+
+  SET ANIO = YEAR(CURRENT_DATE());
+
+	SELECT iDiaFestivoId, vchDescripcion, FechaFestiva FROM diasfestivos WHERE FechaFestiva > CONCAT(ANIO, '0101') AND Activo = 1;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -565,68 +697,129 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetFaltas`(
-EmployerNumber INT,
-EmployerName VARCHAR(100),
-EmployerCompany VARCHAR(100),
-EmployerPaysheet VARCHAR(100),
-FI DATETIME,
+CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetFaltas`(
+
+EmployerNumber INT,
+
+EmployerName VARCHAR(100),
+
+EmployerCompany VARCHAR(100),
+
+EmployerPaysheet VARCHAR(100),
+
+FI DATETIME,
+
 FF DATETIME)
-BEGIN
-  DECLARE FechaInicio DATE default '20150401';
-  DECLARE FechaFin DATE default '20150430';
-  DECLARE DIAS_RESTANTES INT default 0;
-  DECLARE CONTADOR_DIA DATE default FechaInicio;
-  DECLARE int_val INT DEFAULT 0;
-  IF FF <= CURDATE() THEN
-	SET FechaFin = FF;
-  else
-	SET FechaFin = CURDATE();
-  END IF;
-  SET FechaInicio = FI;
-  SET DIAS_RESTANTES = datediff(FechaFin, FechaInicio);
-  SET CONTADOR_DIA = FechaInicio;
-  DROP TABLE IF EXISTS TEMP;
-  CREATE TEMPORARY TABLE TEMP (FECHA DATE, NOMBRE_DIA VARCHAR(10));
-  
-  test_loop : LOOP
-    IF (int_val = DIAS_RESTANTES + 1) THEN
-      LEAVE test_loop;
-    END IF;
-    IF (SELECT COUNT(*) FROM diasfestivos WHERE FechaFestiva = CONTADOR_DIA And Activo = 1) = 0 THEN
-      INSERT INTO TEMP (FECHA, NOMBRE_DIA) VALUES (CONTADOR_DIA, DATE_FORMAT(CONTADOR_DIA, '%W'));
-    END IF;
-    SET CONTADOR_DIA = DATE_ADD(CONTADOR_DIA ,INTERVAL 1 DAY);
-    SET int_val = int_val + 1;
-  END LOOP;
-    SELECT EM.iEmpleadoId AS EmpleadoId,
-		   EM.iNumeroEmpleado AS NumeroEmpleado,
-           EM.vchNombreEmpleado AS NombreEmpleado,
-		   EM.vchCompania AS Compania,
-		   EM.vchNomina AS Nomina,
-           T.FECHA AS FechaFalta,
-		   1 AS NumeroFaltas
-      FROM Empleados EM
-INNER JOIN TEMP T ON T.FECHA = T.FECHA
-INNER JOIN Horarios H ON H.iHorarioId = EM.iHorarioId
- LEFT JOIN (  SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Coorporativo COR INNER JOIN Empleados E ON E.iEmpleadoId = COR.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
-              UNION
-              SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Cedis CED INNER JOIN Empleados E ON E.iEmpleadoId = CED.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
-           )  AS Asistencias ON DATE(Asistencias.FechaRegistro) = DATE(T.FECHA) AND EM.iEmpleadoId = Asistencias.iEmpleadoId
-     WHERE EM.bExterno = 0
-       AND EM.Activo = 1
-       AND (CASE WHEN H.bLunes = 0 AND T.NOMBRE_DIA = 'Monday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bMartes = 0 AND T.NOMBRE_DIA = 'Tuesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bMiercoles = 0 AND T.NOMBRE_DIA = 'Wednesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bJueves = 0 AND T.NOMBRE_DIA = 'Thursday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bViernes = 0 AND T.NOMBRE_DIA = 'Friday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bSabado = 0 AND T.NOMBRE_DIA = 'Saturday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bDomingo = 0 AND T.NOMBRE_DIA = 'Sunday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND Asistencias.DIA IS NULL
-	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
-	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
-	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
-       AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet);
+BEGIN
+
+  DECLARE FechaInicio DATE default '20150401';
+
+  DECLARE FechaFin DATE default '20150430';
+
+  DECLARE DIAS_RESTANTES INT default 0;
+
+  DECLARE CONTADOR_DIA DATE default FechaInicio;
+
+  DECLARE int_val INT DEFAULT 0;
+
+  IF FF <= CURDATE() THEN
+
+	SET FechaFin = FF;
+
+  else
+
+	SET FechaFin = CURDATE();
+
+  END IF;
+
+  SET FechaInicio = FI;
+
+  SET DIAS_RESTANTES = datediff(FechaFin, FechaInicio);
+
+  SET CONTADOR_DIA = FechaInicio;
+
+  DROP TABLE IF EXISTS TEMP;
+
+  CREATE TEMPORARY TABLE TEMP (FECHA DATE, NOMBRE_DIA VARCHAR(10));
+
+  
+
+  test_loop : LOOP
+
+    IF (int_val = DIAS_RESTANTES + 1) THEN
+
+      LEAVE test_loop;
+
+    END IF;
+
+    IF (SELECT COUNT(*) FROM diasfestivos WHERE FechaFestiva = CONTADOR_DIA And Activo = 1) = 0 THEN
+
+      INSERT INTO TEMP (FECHA, NOMBRE_DIA) VALUES (CONTADOR_DIA, DATE_FORMAT(CONTADOR_DIA, '%W'));
+
+    END IF;
+
+    SET CONTADOR_DIA = DATE_ADD(CONTADOR_DIA ,INTERVAL 1 DAY);
+
+    SET int_val = int_val + 1;
+
+  END LOOP;
+
+    SELECT EM.iEmpleadoId AS EmpleadoId,
+
+		   EM.iNumeroEmpleado AS NumeroEmpleado,
+
+           EM.vchNombreEmpleado AS NombreEmpleado,
+
+		   EM.vchCompania AS Compania,
+
+		   EM.vchNomina AS Nomina,
+
+           T.FECHA AS FechaFalta,
+
+		   1 AS NumeroFaltas
+
+      FROM Empleados EM
+
+INNER JOIN TEMP T ON T.FECHA = T.FECHA
+
+INNER JOIN Horarios H ON H.iHorarioId = EM.iHorarioId
+
+ LEFT JOIN (  SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Coorporativo COR INNER JOIN Empleados E ON E.iEmpleadoId = COR.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
+
+              UNION
+
+              SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Cedis CED INNER JOIN Empleados E ON E.iEmpleadoId = CED.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
+
+           )  AS Asistencias ON DATE(Asistencias.FechaRegistro) = DATE(T.FECHA) AND EM.iEmpleadoId = Asistencias.iEmpleadoId
+
+     WHERE EM.bExterno = 0
+
+       AND EM.Activo = 1
+
+       AND (CASE WHEN H.bLunes = 0 AND T.NOMBRE_DIA = 'Monday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bMartes = 0 AND T.NOMBRE_DIA = 'Tuesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bMiercoles = 0 AND T.NOMBRE_DIA = 'Wednesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bJueves = 0 AND T.NOMBRE_DIA = 'Thursday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bViernes = 0 AND T.NOMBRE_DIA = 'Friday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bSabado = 0 AND T.NOMBRE_DIA = 'Saturday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bDomingo = 0 AND T.NOMBRE_DIA = 'Sunday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND Asistencias.DIA IS NULL
+
+	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
+
+	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
+
+	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
+
+       AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet);
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -762,106 +955,205 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetRetardos`(
-EmployerNumber INT,
-EmployerName VARCHAR(100),
-EmployerCompany VARCHAR(100),
-EmployerPaysheet VARCHAR(100),
-FI DATETIME,
+CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_GetRetardos`(
+
+EmployerNumber INT,
+
+EmployerName VARCHAR(100),
+
+EmployerCompany VARCHAR(100),
+
+EmployerPaysheet VARCHAR(100),
+
+FI DATETIME,
+
 FF DATETIME)
-BEGIN
-  IF FF >= CURDATE() THEN
-	SET FF = CURDATE();
-  END IF;
-SELECT IEmpleadoId        AS EmpleadoId,
-  	   iNumeroEmpleado    AS NumeroEmpleado, 
-  	   vchNombreEmpleado  AS NombreEmpleado,
-  	   vchCompania        AS Compania,
-  	   vchNomina          AS Nomina,
-  	   COUNT(Retardo)     AS NumeroRetardos
-FROM (
-SELECT iEmpleadoId,
-       iNumeroEmpleado,
-       vchNombreEmpleado,
-       vchNomina,
-       vchCompania,
-       FechaRegistro,
-       Dia,
-       Retardo
-FROM (
-SELECT EM.iEmpleadoId,
-		   EM.iNumeroEmpleado, 
-		   EM.vchNombreEmpleado,
-		   EM.vchNomina,
-		   EM.vchCompania,
-		   DATE(COR.FechaRegistro) AS FechaRegistro,
-		   Date_format(COR.FechaRegistro, '%d/%m/%Y') AS Dia,
-		   CASE 
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   ELSE	'IGNORADO'
-		   END AS Retardo
-	  FROM Entrada_coorporativo COR
-INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
-INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
-	 WHERE EM.Activo = 1 
-	   AND EM.bExterno = 0
-	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
-	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
-	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
-	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
-     AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet)
-GROUP BY Dia, iEmpleadoId
-UNION
-SELECT EM.iEmpleadoId,
-		   EM.iNumeroEmpleado, 
-		   EM.vchNombreEmpleado,
-		   EM.vchNomina,
-		   EM.vchCompania,
-		   DATE(COR.FechaRegistro) AS FechaRegistro,
-		   Date_format(COR.FechaRegistro, '%d/%m/%Y') AS Dia,
-		   CASE 
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
-				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
-		   ELSE	'IGNORADO'
-		   END AS Retardo
-	  FROM Entrada_cedis COR
-INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
-INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
-	 WHERE EM.Activo = 1 
-	   AND EM.bExterno = 0
-	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
-	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
-	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
-	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
-       AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet)
-  GROUP BY Dia, iEmpleadoId 
-  ) AS A GROUP BY Dia, iEmpleadoId
-  ) AS B WHERE Retardo = 'RETARDO' GROUP BY iEmpleadoId;
+BEGIN
+
+  IF FF >= CURDATE() THEN
+
+	SET FF = CURDATE();
+
+  END IF;
+
+SELECT IEmpleadoId        AS EmpleadoId,
+
+  	   iNumeroEmpleado    AS NumeroEmpleado, 
+
+  	   vchNombreEmpleado  AS NombreEmpleado,
+
+  	   vchCompania        AS Compania,
+
+  	   vchNomina          AS Nomina,
+
+  	   COUNT(Retardo)     AS NumeroRetardos
+
+FROM (
+
+SELECT iEmpleadoId,
+
+       iNumeroEmpleado,
+
+       vchNombreEmpleado,
+
+       vchNomina,
+
+       vchCompania,
+
+       FechaRegistro,
+
+       Dia,
+
+       Retardo
+
+FROM (
+
+SELECT EM.iEmpleadoId,
+
+		   EM.iNumeroEmpleado, 
+
+		   EM.vchNombreEmpleado,
+
+		   EM.vchNomina,
+
+		   EM.vchCompania,
+
+		   DATE(COR.FechaRegistro) AS FechaRegistro,
+
+		   Date_format(COR.FechaRegistro, '%d/%m/%Y') AS Dia,
+
+		   CASE 
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   ELSE	'IGNORADO'
+
+		   END AS Retardo
+
+	  FROM Entrada_coorporativo COR
+
+INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
+
+INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
+
+	 WHERE EM.Activo = 1 
+
+	   AND EM.bExterno = 0
+
+	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
+
+	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
+
+	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
+
+	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
+
+     AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet)
+
+GROUP BY Dia, iEmpleadoId
+
+UNION
+
+SELECT EM.iEmpleadoId,
+
+		   EM.iNumeroEmpleado, 
+
+		   EM.vchNombreEmpleado,
+
+		   EM.vchNomina,
+
+		   EM.vchCompania,
+
+		   DATE(COR.FechaRegistro) AS FechaRegistro,
+
+		   Date_format(COR.FechaRegistro, '%d/%m/%Y') AS Dia,
+
+		   CASE 
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Monday' AND HO.bLunes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaLunes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Tuesday' AND HO.bMartes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMartes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Wednesday' AND HO.bMiercoles = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaMiercoles) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Thursday' AND HO.bJueves = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaJueves) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Friday' AND HO.bViernes = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaViernes) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Saturday' AND HO.bSabado = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i')  <= TIME_FORMAT((TIME(HO.vchEntradaSabado) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   WHEN Date_format(COR.FechaRegistro, '%W') = 'Sunday' AND HO.bDomingo = 1 THEN
+
+				CASE WHEN Date_format(COR.FechaRegistro, '%H:%i') <= TIME_FORMAT((TIME(HO.vchEntradaDomingo) + TIME((SELECT Dato FROM ConfiguracionIncidencias WHERE iConfiguracionId = 1))), '%H:%i') THEN 'PUNTUAL' ELSE 'RETARDO' END
+
+		   ELSE	'IGNORADO'
+
+		   END AS Retardo
+
+	  FROM Entrada_cedis COR
+
+INNER JOIN Empleados EM ON EM.iEmpleadoId = COR.iEmpleadoId
+
+INNER JOIN Horarios HO ON EM.iHorarioId = HO.iHorarioId
+
+	 WHERE EM.Activo = 1 
+
+	   AND EM.bExterno = 0
+
+	   AND FechaRegistro Between FI AND DATE_ADD(FF ,INTERVAL 1 DAY)
+
+	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
+
+	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
+
+	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
+
+       AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet)
+
+  GROUP BY Dia, iEmpleadoId 
+
+  ) AS A GROUP BY Dia, iEmpleadoId
+
+  ) AS B WHERE Retardo = 'RETARDO' GROUP BY iEmpleadoId;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -878,71 +1170,135 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_ReporteIncidencias`(
-EmployerNumber INT,
-EmployerName VARCHAR(100),
-EmployerCompany VARCHAR(100),
-EmployerPaysheet VARCHAR(100),
-FI DATETIME,
+CREATE DEFINER=`lgonzalez`@`%` PROCEDURE `stp_ReporteIncidencias`(
+
+EmployerNumber INT,
+
+EmployerName VARCHAR(100),
+
+EmployerCompany VARCHAR(100),
+
+EmployerPaysheet VARCHAR(100),
+
+FI DATETIME,
+
 FF DATETIME)
-BEGIN
-  DECLARE FechaInicio DATE default '20150401';
-  DECLARE FechaFin DATE default '20150430';
-  DECLARE DIAS_RESTANTES INT default 0;
-  DECLARE CONTADOR_DIA DATE default FechaInicio;
-  DECLARE int_val INT DEFAULT 0;
-  IF FF <= CURDATE() THEN
-	SET FechaFin = FF;
-  else
-	SET FechaFin = CURDATE();
-  END IF;
-  SET FechaInicio = FI;
-  SET DIAS_RESTANTES = datediff(FechaFin, FechaInicio);
-  SET CONTADOR_DIA = FechaInicio;
-  DROP TABLE IF EXISTS TEMP;
-  CREATE TEMPORARY TABLE TEMP (FECHA DATE, NOMBRE_DIA VARCHAR(10));
-  
-  test_loop : LOOP
-    IF (int_val = DIAS_RESTANTES + 1) THEN
-      LEAVE test_loop;
-    END IF;
-    IF (SELECT COUNT(*) FROM diasfestivos WHERE FechaFestiva = CONTADOR_DIA And Activo = 1) = 0 THEN
-      INSERT INTO TEMP (FECHA, NOMBRE_DIA) VALUES (CONTADOR_DIA, DATE_FORMAT(CONTADOR_DIA, '%W'));
-    END IF;
-    SET CONTADOR_DIA = DATE_ADD(CONTADOR_DIA ,INTERVAL 1 DAY);
-    SET int_val = int_val + 1;
-  END LOOP;
-  SELECT EmpleadoId, NumeroEmpleado, NombreEmpleado, Compania, Nomina, FECHA, Concepto FROM(
-    SELECT EM.iEmpleadoId AS EmpleadoId,
-    		   EM.iNumeroEmpleado AS NumeroEmpleado,
-           EM.vchNombreEmpleado AS NombreEmpleado,
-    		   EM.vchCompania AS Compania,
-    		   EM.vchNomina AS Nomina,
-           CASE WHEN Asistencias.DIA IS NULL THEN T.FECHA ELSE Asistencias.FechaRegistro END AS FECHA,
-           T.FECHA AS FECHA_REFERENCIA,
-    		   CASE WHEN Asistencias.DIA IS NULL THEN 'FALTA' ELSE 'ASISTENCIA' END AS Concepto
-      FROM Empleados EM
-INNER JOIN TEMP T ON T.FECHA = T.FECHA
-INNER JOIN Horarios H ON H.iHorarioId = EM.iHorarioId
- LEFT JOIN (  SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Coorporativo COR INNER JOIN Empleados E ON E.iEmpleadoId = COR.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
-              UNION
-              SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Cedis CED INNER JOIN Empleados E ON E.iEmpleadoId = CED.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
-           )  AS Asistencias ON DATE(Asistencias.FechaRegistro) = DATE(T.FECHA) AND EM.iEmpleadoId = Asistencias.iEmpleadoId
-     WHERE EM.bExterno = 0
-       AND EM.Activo = 1
-       AND (CASE WHEN H.bLunes = 0 AND T.NOMBRE_DIA = 'Monday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bMartes = 0 AND T.NOMBRE_DIA = 'Tuesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bMiercoles = 0 AND T.NOMBRE_DIA = 'Wednesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bJueves = 0 AND T.NOMBRE_DIA = 'Thursday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bViernes = 0 AND T.NOMBRE_DIA = 'Friday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bSabado = 0 AND T.NOMBRE_DIA = 'Saturday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-       AND (CASE WHEN H.bDomingo = 0 AND T.NOMBRE_DIA = 'Sunday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
-  	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
-  	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
-  	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
-       AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet)
-  ORDER BY NombreEmpleado, Fecha ASC
-  ) AS TABLA GROUP BY FECHA_REFERENCIA, EmpleadoId ;
+BEGIN
+
+  DECLARE FechaInicio DATE default '20150401';
+
+  DECLARE FechaFin DATE default '20150430';
+
+  DECLARE DIAS_RESTANTES INT default 0;
+
+  DECLARE CONTADOR_DIA DATE default FechaInicio;
+
+  DECLARE int_val INT DEFAULT 0;
+
+  IF FF <= CURDATE() THEN
+
+	SET FechaFin = FF;
+
+  else
+
+	SET FechaFin = CURDATE();
+
+  END IF;
+
+  SET FechaInicio = FI;
+
+  SET DIAS_RESTANTES = datediff(FechaFin, FechaInicio);
+
+  SET CONTADOR_DIA = FechaInicio;
+
+  DROP TABLE IF EXISTS TEMP;
+
+  CREATE TEMPORARY TABLE TEMP (FECHA DATE, NOMBRE_DIA VARCHAR(10));
+
+  
+
+  test_loop : LOOP
+
+    IF (int_val = DIAS_RESTANTES + 1) THEN
+
+      LEAVE test_loop;
+
+    END IF;
+
+    IF (SELECT COUNT(*) FROM diasfestivos WHERE FechaFestiva = CONTADOR_DIA And Activo = 1) = 0 THEN
+
+      INSERT INTO TEMP (FECHA, NOMBRE_DIA) VALUES (CONTADOR_DIA, DATE_FORMAT(CONTADOR_DIA, '%W'));
+
+    END IF;
+
+    SET CONTADOR_DIA = DATE_ADD(CONTADOR_DIA ,INTERVAL 1 DAY);
+
+    SET int_val = int_val + 1;
+
+  END LOOP;
+
+  SELECT EmpleadoId, NumeroEmpleado, NombreEmpleado, Compania, Nomina, FECHA, Concepto FROM(
+
+    SELECT EM.iEmpleadoId AS EmpleadoId,
+
+    		   EM.iNumeroEmpleado AS NumeroEmpleado,
+
+           EM.vchNombreEmpleado AS NombreEmpleado,
+
+    		   EM.vchCompania AS Compania,
+
+    		   EM.vchNomina AS Nomina,
+
+           CASE WHEN Asistencias.DIA IS NULL THEN T.FECHA ELSE Asistencias.FechaRegistro END AS FECHA,
+
+           T.FECHA AS FECHA_REFERENCIA,
+
+    		   CASE WHEN Asistencias.DIA IS NULL THEN 'FALTA' ELSE 'ASISTENCIA' END AS Concepto
+
+      FROM Empleados EM
+
+INNER JOIN TEMP T ON T.FECHA = T.FECHA
+
+INNER JOIN Horarios H ON H.iHorarioId = EM.iHorarioId
+
+ LEFT JOIN (  SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Coorporativo COR INNER JOIN Empleados E ON E.iEmpleadoId = COR.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
+
+              UNION
+
+              SELECT E.iEmpleadoId, FechaRegistro, DATE(FechaRegistro) AS DIA FROM Entrada_Cedis CED INNER JOIN Empleados E ON E.iEmpleadoId = CED.iEmpleadoId WHERE E.Activo = 1 AND FechaRegistro BETWEEN FechaInicio AND DATE_ADD(FechaFin ,INTERVAL 1 DAY) GROUP BY iEmpleadoId, DIA
+
+           )  AS Asistencias ON DATE(Asistencias.FechaRegistro) = DATE(T.FECHA) AND EM.iEmpleadoId = Asistencias.iEmpleadoId
+
+     WHERE EM.bExterno = 0
+
+       AND EM.Activo = 1
+
+       AND (CASE WHEN H.bLunes = 0 AND T.NOMBRE_DIA = 'Monday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bMartes = 0 AND T.NOMBRE_DIA = 'Tuesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bMiercoles = 0 AND T.NOMBRE_DIA = 'Wednesday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bJueves = 0 AND T.NOMBRE_DIA = 'Thursday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bViernes = 0 AND T.NOMBRE_DIA = 'Friday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bSabado = 0 AND T.NOMBRE_DIA = 'Saturday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+       AND (CASE WHEN H.bDomingo = 0 AND T.NOMBRE_DIA = 'Sunday' THEN '' ELSE T.NOMBRE_DIA END) = T.NOMBRE_DIA
+
+  	   AND (EmployerNumber = 0 OR EM.iNumeroEmpleado = EmployerNumber) 
+
+  	   AND (EmployerName = '' OR EM.vchNombreEmpleado LIKE CONCAT('%',EmployerName, '%')) 
+
+  	   AND (EmployerCompany = '' OR EM.vchCompania = EmployerCompany) 
+
+       AND (EmployerPaysheet = '' OR EM.vchNomina = EmployerPaysheet)
+
+  ORDER BY NombreEmpleado, Fecha ASC
+
+  ) AS TABLA GROUP BY FECHA_REFERENCIA, EmpleadoId ;
+
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
