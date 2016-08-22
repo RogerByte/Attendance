@@ -103,7 +103,9 @@
     <Compile Include="DataAccess\Attendance.cs" />
     <Compile Include="DataAccess\Eslabon.cs" />
     <Compile Include="Entities\cat_solicitud.cs" />
+    <Compile Include="Entities\DiaVacacional.cs" />
     <Compile Include="Entities\Empleado.cs" />
+    <Compile Include="Entities\PaqueteVacacional.cs" />
     <Compile Include="Entities\Solicitud.cs" />
     <Compile Include="ServiceContracts\Credentials.cs" />
     <Compile Include="Kiosco.svc.cs">

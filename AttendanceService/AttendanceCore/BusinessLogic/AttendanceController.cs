@@ -289,6 +289,9 @@ namespace AttendanceCore.BusinessLogic
                 case 4: //Comedor de Almacén
                     Empleado = ControladorReloj.ConsultaEmpleado(idEmpleado.ToString(), ControladorReloj.ComedorCEDIS);
                     break;
+                case 5:
+                    Empleado = ControladorReloj.ConsultaEmpleado(idEmpleado.ToString(), ControladorReloj.EntradaCEDISNorte);
+                    break;
                 default:
                     break;
             }
@@ -314,17 +317,38 @@ namespace AttendanceCore.BusinessLogic
             return AltaExistosa;
         }
         /// <summary>
-        /// Da de alta la lista de empleados en los dispositivos de reloj checador
+        /// Da de alta la lista de empleados en el dispositivo seleccionado
         /// </summary>
         /// <param name="Empleados"></param>
         /// <returns></returns>
-        public bool AltaEmpleadosDispositivo(List<DeviceEmployeer> Empleados)
+        public bool AltaEmpleadosDispositivo(List<DeviceEmployeer> Empleados, int Dispositivo)
         {
             bool AltaExistosa = false;
             DeviceDriver ControladorReloj = new DeviceDriver();
             try
             {
-                AltaExistosa = ControladorReloj.AltaEmpleados(Empleados);
+                switch (Dispositivo)
+                {
+                    case 1:
+                        AltaExistosa = ControladorReloj.AltaEmpleados(Empleados, ControladorReloj.EntradaCoorporativo);
+                        break;
+                    case 2:
+                        AltaExistosa = ControladorReloj.AltaEmpleados(Empleados, ControladorReloj.ComedorCoorporativo);
+                        break;
+                    case 3:
+                        AltaExistosa = ControladorReloj.AltaEmpleados(Empleados, ControladorReloj.EntradaCEDIS);
+                        break;
+                    case 4:
+                        AltaExistosa = ControladorReloj.AltaEmpleados(Empleados, ControladorReloj.ComedorCEDIS);
+                        break;
+                    case 5:
+                        AltaExistosa = ControladorReloj.AltaEmpleados(Empleados, ControladorReloj.EntradaCEDISNorte);
+                        break;
+                    default:
+                        
+                        break;
+                }
+                
             }
             catch (Exception exc)
             {
@@ -376,6 +400,9 @@ namespace AttendanceCore.BusinessLogic
                     case 4:
                         Response = ControladorReloj.BorrarEmpleados(IdEmpleados, ControladorReloj.ComedorCEDIS);
                         break;
+                    case 5:
+                        Response = ControladorReloj.BorrarEmpleados(IdEmpleados, ControladorReloj.EntradaCEDISNorte);
+                        break;
                     default:
                         break;
                 }
@@ -410,6 +437,9 @@ namespace AttendanceCore.BusinessLogic
                         break;
                     case 4: //Comedor de Almacén
                         Empleados = ControladorReloj.ExtraeEmpleados(ControladorReloj.ComedorCEDIS);
+                        break;
+                    case 5:
+                        Empleados = ControladorReloj.ExtraeEmpleados(ControladorReloj.EntradaCEDISNorte);
                         break;
                     default:
                         break;
@@ -571,6 +601,17 @@ namespace AttendanceCore.BusinessLogic
                         break;
                     case 4://comedor CEDIS
                         EmpleadoReloj = RelojChecador.ConsultaEmpleado(empleado.iEmpleadoId.ToString(), RelojChecador.ComedorCEDIS);
+                        empleado.Enabled = EmpleadoReloj.Enabled;
+                        empleado.FingerFlag = EmpleadoReloj.FingerFlag;
+                        empleado.FingerPrint = EmpleadoReloj.FingerPrint;
+                        empleado.FingerPrintLength = EmpleadoReloj.FingerPrintLength;
+                        empleado.NumeroTarjeta = EmpleadoReloj.NumeroTarjeta;
+                        empleado.Password = EmpleadoReloj.Password;
+                        empleado.Privilegio = EmpleadoReloj.Privilegio;
+                        Response = EditaEmpleado(empleado);
+                        break;
+                    case 5:
+                        EmpleadoReloj = RelojChecador.ConsultaEmpleado(empleado.iEmpleadoId.ToString(), RelojChecador.EntradaCEDISNorte);
                         empleado.Enabled = EmpleadoReloj.Enabled;
                         empleado.FingerFlag = EmpleadoReloj.FingerFlag;
                         empleado.FingerPrint = EmpleadoReloj.FingerPrint;
@@ -874,6 +915,7 @@ namespace AttendanceCore.BusinessLogic
                 DeviceDriver Relojes = new DeviceDriver();
                 AttendanceDA BaseDatosAttendance = new AttendanceDA();
                 List<GLogData> Registros = Relojes.ObtenerRegistros(Relojes.EntradaCEDIS);
+                Registros.AddRange(Relojes.ObtenerRegistros(Relojes.EntradaCEDISNorte));
                 List<Registro> RegDataBase = new List<Registro>();
                 foreach (GLogData log in Registros)
                 {

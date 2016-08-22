@@ -65,7 +65,7 @@ namespace AttendanceCore
         bool AltaEmpleadoReloj(DeviceEmployeer Empleado);
 
         [OperationContract(Name = "AltaEmpleadosReloj")]
-        bool AltaEmpleadosReloj(List<DeviceEmployeer> Empleados);
+        bool AltaEmpleadosReloj(List<DeviceEmployeer> Empleados, int Dispositivo);
 
         [OperationContract(Name = "BorraEmpleadoReloj")]
         bool BorraEmpleadoReloj(int Empleado);

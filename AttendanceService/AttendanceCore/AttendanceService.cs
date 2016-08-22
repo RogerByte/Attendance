@@ -122,10 +122,10 @@ namespace AttendanceCore
             AttendanceController Controller = new AttendanceController();
             return Controller.AltaEmpleadoDispositivo(Empleado);
         }
-        public bool AltaEmpleadosReloj(List<DeviceEmployeer> Empleados)
+        public bool AltaEmpleadosReloj(List<DeviceEmployeer> Empleados, int Dispositivo)
         {
             AttendanceController Controller = new AttendanceController();
-            return Controller.AltaEmpleadosDispositivo(Empleados);
+            return Controller.AltaEmpleadosDispositivo(Empleados, Dispositivo);
         }
         public bool BorraEmpleadoReloj(int Empleado)
         {

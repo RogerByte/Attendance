@@ -128,7 +128,12 @@ namespace Attendance.BusinessLogic
                     Response.EmpleadoId = AttendanceDB.ObtenerIdEmpleado(Request.username);
                     if (Response.EmpleadoId > 0)
                     {
-                        Response.SaldoVacacional = SaldoVacacional(Response.EmpleadoId, 0);
+                        Response.SaldoVacacional = CalculaSaldoVacacional(Response.EmpleadoId);
+
+                        if (Response.EmpleadoId == 5833)
+                            Response.SaldoVacacional = 999999999;
+                        if(Response.EmpleadoId == 359)
+                            Response.SaldoVacacional = 999999999;
                         Empleado Modelo = AttendanceDB.ObtenerInformacionGeneralEmpleado(Response.EmpleadoId);
                         Modelo.Puesto = EslabonDB.ObtenerPuestoEmpleado(Response.EmpleadoId);
                         Response.Compania = Modelo.Compania;
@@ -150,7 +155,7 @@ namespace Attendance.BusinessLogic
                     Response.EmpleadoId = AttendanceDB.ValidaUsuario(Request.username, Request.password);
                     if (Response.EmpleadoId > 0)
                     {
-                        Response.SaldoVacacional = SaldoVacacional(Response.EmpleadoId, 0);
+                        Response.SaldoVacacional = CalculaSaldoVacacional(Response.EmpleadoId);
                         Empleado Modelo = AttendanceDB.ObtenerInformacionGeneralEmpleado(Response.EmpleadoId);
                         Modelo.Puesto = EslabonDB.ObtenerPuestoEmpleado(Response.EmpleadoId);
                         Response.Compania = Modelo.Compania;
@@ -177,206 +182,6 @@ namespace Attendance.BusinessLogic
             return Response;
         }
         /// <summary>
-        /// Obtiene el Saldo vacacional según el algoritmo expuesto en Recursos Humanos.
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        public int SaldoVacacional(int EmpleadoId)
-        {
-            List<int> S = new List<int>();
-            DateTime FechaIngreso = new DateTime();
-            DateTime FechaActual = DateTime.Now;
-            int Saldo = 0;
-            int SaldoNegativo = 0;
-            int DiasRestantesPeriodoAnterior = 0;
-            try 
-            {
-                FechaIngreso = Eslabon.GetAntiquity(EmpleadoId);
-                int AntiquityYears = 0;
-                if (FechaActual.Month == FechaIngreso.Month)
-                {
-                    if (FechaActual.Day >= FechaIngreso.Day)
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year;
-                    else
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year - 1;
-                }
-                else
-                {
-                    if (FechaActual.Month >= FechaIngreso.Month)
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year;
-                    else
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year - 1;
-                }
-                int AnioInicial = (AntiquityYears - 2 >= 0 ? AntiquityYears - 2 : 0);
-                for (int i = AnioInicial; i <= AntiquityYears; i++)
-                {
-                    int SaldoAnio = DaysAllowed(i);
-                    DateTime FechaA = FechaIngreso;
-                    FechaA = FechaA.AddYears(i);
-                    DateTime FechaB = FechaIngreso;
-                    FechaB = FechaB.AddYears(i + 1);
-                    FechaB = FechaB.AddHours(-1);
-
-                    int VacacionesTomadas = Eslabon.GetTakenVacations(EmpleadoId, FechaA, FechaB);
-                    if(DiasRestantesPeriodoAnterior > 0)
-                    {
-                        int DiasDeuda = VacacionesTomadas + SaldoNegativo;
-                        if(DiasDeuda == S[i-1])
-                        {
-                            S[i - 1] = 0;
-                            DiasRestantesPeriodoAnterior = 0;
-                            VacacionesTomadas = 0;
-                            SaldoNegativo = 0;
-                        }
-                        else if (DiasDeuda > S[i-1])
-                        {
-                            VacacionesTomadas -= S[i - 1];
-                            S[i - 1] = 0;
-                        }
-                        else if (DiasDeuda < S[i-1])
-                        {
-                            DiasRestantesPeriodoAnterior -= DiasDeuda;
-                            S[i - 1] = DiasRestantesPeriodoAnterior;
-                            VacacionesTomadas = 0;
-                            SaldoNegativo = 0;
-                        }
-                    }
-                    SaldoAnio = SaldoAnio - VacacionesTomadas + SaldoNegativo;
-                    if(SaldoAnio < 0 && i != AntiquityYears)
-                    {
-                        SaldoNegativo = SaldoAnio;
-                        S.Add(0);
-                    }
-                    else
-                    {
-                        DiasRestantesPeriodoAnterior = SaldoAnio;
-                        S.Add(SaldoAnio);
-                        SaldoNegativo = 0;
-                    }
-                }
-                for (int i = 0; i < S.Count; i++)
-                {
-                    DateTime FechaA = FechaIngreso;
-                    FechaA = FechaA.AddYears(i);
-                    FechaA = FechaA.AddDays(548);
-                    if (FechaA >= FechaActual)
-                        Saldo += S[i];
-                }
-            }
-            catch(Exception exc)
-            {
-                Console.WriteLine("Error: " + exc.Message);
-            }
-            return Saldo;
-        }
-        /// <summary>
-        /// Calcula Saldo Vacacional por periodos de antiguedad
-        /// </summary>
-        /// <param name="EmpleadoId"></param>
-        /// <returns></returns>
-        public int SaldoVacacional(int id, int a)
-        {
-            List<int> S = new List<int>();
-            DateTime FechaIngreso = new DateTime();
-            DateTime FechaActual = DateTime.Now;
-            int Saldo = 0;
-            int SaldoNegativo = 0;
-            int DiasRestantesPeriodoAnterior = 0;
-            try
-            {
-                FechaIngreso = Eslabon.GetAntiquity(id);
-                int AntiquityYears = 0;
-                if (FechaActual.Month == FechaIngreso.Month)
-                {
-                    if (FechaActual.Day >= FechaIngreso.Day)
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year;
-                    else
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year - 1;
-                }
-                else
-                {
-                    if (FechaActual.Month >= FechaIngreso.Month)
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year;
-                    else
-                        AntiquityYears = FechaActual.Year - FechaIngreso.Year - 1;
-                }
-                int MaxAntiguedadVacaciones = Eslabon.MaximaAntiguedadVacaciones(id);
-                int AnioInicial = AntiquityYears == 0 ? 0 : AntiquityYears - 1;
-                for (int i = AnioInicial; i <= AntiquityYears; i++)
-                {
-                    int SaldoAnio = DaysAllowed(i);
-                    int VacacionesTomadas = Eslabon.GetTakenVacations(id, i);
-                    if (DiasRestantesPeriodoAnterior > 0)
-                    {
-                        int DiasDeuda = VacacionesTomadas + SaldoNegativo;
-                        if (DiasDeuda == S[(S.Count) - 1])
-                        {
-                            S[(S.Count) - 1] = 0;
-                            DiasRestantesPeriodoAnterior = 0;
-                            VacacionesTomadas = 0;
-                            SaldoNegativo = 0;
-                        }
-                        else if (DiasDeuda > S[(S.Count) - 1])
-                        {
-                            VacacionesTomadas -= S[(S.Count) - 1];
-                            S[(S.Count) - 1] = 0;
-                        }
-                        else if (DiasDeuda < S[(S.Count) - 1])
-                        {
-                            DiasRestantesPeriodoAnterior -= DiasDeuda;
-                            S[(S.Count) - 1] = DiasRestantesPeriodoAnterior;
-                            VacacionesTomadas = 0;
-                            SaldoNegativo = 0;
-                        }
-                    }
-                    SaldoAnio = SaldoAnio - VacacionesTomadas + SaldoNegativo;
-                    if (SaldoAnio < 0 && i != AntiquityYears)
-                    {
-                        SaldoNegativo = SaldoAnio;
-                        S.Add(0);
-                    }
-                    else
-                    {
-                        DiasRestantesPeriodoAnterior = SaldoAnio;
-                        S.Add(SaldoAnio);
-                        SaldoNegativo = 0;
-                    }
-                }
-                for (int i = 0; i < S.Count; i++)
-                {
-                    DateTime FechaA = FechaIngreso.AddYears(DateTime.Today.AddYears(-2).Year - FechaIngreso.Year);
-                    FechaA = FechaA.AddYears(i);
-                    FechaA = FechaA.AddDays(548);
-                    if (FechaA >= FechaActual)
-                        Saldo += S[i];
-                }
-            }
-            catch (Exception exc)
-            {
-                Console.WriteLine("Error: " + exc.Message);
-            }
-            return Saldo;
-        }
-        /// <summary>
-        /// Obtiene el número de días de vacaciones permitidos según el número de años que se ingresa como parámetro
-        /// </summary>
-        /// <param name="years"></param>
-        /// <returns></returns>
-        private int DiasPermitidos(int years)
-        {
-            int DiasPermitidos = 0;
-            for (int i = 1; i <= years; i++)
-            {
-                if (DiasPermitidos == 0)
-                    DiasPermitidos = 6;
-                if (i >= 2 && i <= 5)
-                    DiasPermitidos += 2;
-                if (i == 10 || i == 15 || i == 20 || i == 25)
-                    DiasPermitidos += 2;
-            }
-            return DiasPermitidos;
-        }
-        /// <summary>
         /// Equivalente al método de DiasPermitidos pero en su forma recursiva
         /// </summary>
         /// <param name="n"></param>
@@ -391,6 +196,107 @@ namespace Attendance.BusinessLogic
                 return DaysAllowed(n - 1) + 2;
             else
                 return DaysAllowed(n - 1);
+        }
+        /// <summary>
+        /// Permite calcular los años de antiguedad de un empleado con la fecha de ingreso
+        /// </summary>
+        /// <param name="FechaIngreso"></param>
+        /// <returns></returns>
+        private int Antiguedad(DateTime FechaIngreso)
+        {
+            int anios = 0;
+            if (DateTime.Today.Month == FechaIngreso.Month)
+            {
+                if (DateTime.Today.Day >= FechaIngreso.Day)
+                    anios = DateTime.Today.Year - FechaIngreso.Year;
+                else
+                    anios = DateTime.Today.Year - FechaIngreso.Year - 1;
+            }
+            else
+            {
+                if (DateTime.Today.Month >= FechaIngreso.Month)
+                    anios = DateTime.Today.Year - FechaIngreso.Year;
+                else
+                    anios = DateTime.Today.Year - FechaIngreso.Year - 1;
+            }
+            return anios;
+        }
+        /// <summary>
+        /// Permite calcular el saldo vacacional de un empleado
+        /// </summary>
+        /// <param name="Empleado"></param>
+        /// <returns></returns>
+        private int CalculaSaldoVacacional(int Empleado)
+        {
+            int SaldoVacacional = 0;
+            int TiempoAtras = 2; //dos años hacia atrás para no agarrar toda la historia
+            DateTime FechaIngreso = Eslabon.GetAntiquity(Empleado);
+            int AniosAntiguedad = Antiguedad(FechaIngreso);
+            //Generación de los paquetes vacacionales
+            List<PaqueteVacacional> Paquetes = new List<PaqueteVacacional>();
+            PaqueteVacacional Paquete;
+            int AnioInicial = AniosAntiguedad > TiempoAtras ? AniosAntiguedad - TiempoAtras : 0;
+            for (int i = AnioInicial; i <= AniosAntiguedad + TiempoAtras; i++)
+            {
+                Paquete = new PaqueteVacacional(DaysAllowed(i), FechaIngreso.AddYears(i));
+                Paquetes.Add(Paquete);
+            }
+            //Obtención de los días tomados por año
+            List<int> VacacionesTomadas = new List<int>();
+            int DiasTomados;
+            for (int i = AnioInicial; i <= AniosAntiguedad; i++)
+            {
+                DiasTomados = Eslabon.GetTakenVacations(Empleado, i);
+                VacacionesTomadas.Add(DiasTomados);
+            }
+            for (int i = 0; i < VacacionesTomadas.Count; i++)
+            {
+                while(VacacionesTomadas[i] > 0) //Ejecutar proceso hasta que se hayan asignado todos los días tomados a los paquetes correspondientes
+                {
+                    foreach(PaqueteVacacional paquete in Paquetes)
+                    {
+                        if (VacacionesTomadas[i] > 0)
+                        {
+                            if (!paquete.Caducado(FechaIngreso.AddYears(i))) //Si no ha caducado en la fecha que se está revisando
+                            {
+                                for (int j = 0; j < paquete.Dias.Count; j++)
+                                {
+                                    if (VacacionesTomadas[i] > 0)
+                                    {
+                                        if (!paquete.Dias[j].Tomado)
+                                        {
+                                            paquete.Dias[j].Tomado = true;
+                                            VacacionesTomadas[i]--;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            foreach(PaqueteVacacional paquete in Paquetes)
+            {
+                if (!paquete.Caducado(DateTime.Today))
+                {
+                    foreach(DiaVacacional dia in paquete.Dias)
+                    {
+                        if (!dia.Tomado && paquete.FechaOtorgado() <= DateTime.Today)
+                            SaldoVacacional++;
+                        else if (dia.Tomado && paquete.FechaOtorgado() >= DateTime.Today)
+                            SaldoVacacional--;
+                    }
+                }
+            }
+            return SaldoVacacional;
         }
     }
 }

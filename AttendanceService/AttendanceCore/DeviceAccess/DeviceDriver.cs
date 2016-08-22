@@ -34,6 +34,7 @@ namespace AttendanceCore.DeviceAccess
         public Device EntradaCEDIS { get; set; }
         public Device ComedorCoorporativo { get; set; }
         public Device ComedorCEDIS { get; set; }
+        public Device EntradaCEDISNorte { get; set; }
         private bool EnableDeviceOperations { get; set; }
 
         public DeviceDriver()
@@ -42,6 +43,7 @@ namespace AttendanceCore.DeviceAccess
             EntradaCEDIS = new Device();
             ComedorCoorporativo = new Device();
             ComedorCEDIS = new Device();
+            EntradaCEDISNorte = new Device();
             EntradaCoorporativo.ip = ConfigurationManager.AppSettings["EntradaCoorporativo"].ToString();
             EntradaCoorporativo.MachineNumber = 1;
             EntradaCEDIS.ip = ConfigurationManager.AppSettings["EntradaCEDIS"].ToString();
@@ -50,6 +52,8 @@ namespace AttendanceCore.DeviceAccess
             ComedorCoorporativo.MachineNumber = 3;
             ComedorCEDIS.ip = ConfigurationManager.AppSettings["ComedorCEDIS"].ToString();
             ComedorCEDIS.MachineNumber = 4;
+            EntradaCEDISNorte.ip = ConfigurationManager.AppSettings["EntradaCEDISNorte"].ToString();
+            EntradaCEDISNorte.MachineNumber = 5;
             EnableDeviceOperations = Convert.ToBoolean(ConfigurationManager.AppSettings["EnableDevices"]);
         }
         /// <summary>
@@ -72,6 +76,8 @@ namespace AttendanceCore.DeviceAccess
                         Dispositivos.Add(ComedorCoorporativo);
                     if (MasterDevice != ComedorCEDIS)
                         Dispositivos.Add(ComedorCEDIS);
+                    if (MasterDevice != EntradaCEDISNorte)
+                        Dispositivos.Add(EntradaCEDISNorte);
                     if (MasterDevice.DeviceController.Connect_Net(MasterDevice.ip, 4370))
                     {
                         DeviceEmployeer EmpleadoOrigen = new DeviceEmployeer();
@@ -136,74 +142,66 @@ namespace AttendanceCore.DeviceAccess
             return response;
         }
         /// <summary>
-        /// Permite dar de alta una serie de empleados a todos los relojes checadores, este método es recomendable cuando se desea realizar una alta masiva de empleados
+        /// Permite dar de alta una serie de empleados al reloj checador seleccionado
         /// </summary>
         /// <param name="Empleados"></param>
         /// <returns></returns>
-        public bool AltaEmpleados(List<DeviceEmployeer> Empleados)
+        public bool AltaEmpleados(List<DeviceEmployeer> Empleados, Device Dispositivo)
         {
             bool response = false;
             if (EnableDeviceOperations)
                 try
                 {
-                    List<Device> Dispositivos = new List<Device>();
-                    Dispositivos.Add(EntradaCoorporativo);
-                    Dispositivos.Add(EntradaCEDIS);
-                    Dispositivos.Add(ComedorCoorporativo);
-                    Dispositivos.Add(ComedorCEDIS);
-                    foreach (Device Dispositivo in Dispositivos)
+                    bool Conectado = Dispositivo.DeviceController.Connect_Net(Dispositivo.ip, 4370);
+                    int idwFingerIndex = 0;
+                    int iFlag = 1;
+                    if (Conectado)
                     {
-                        bool Conectado = Dispositivo.DeviceController.Connect_Net(Dispositivo.ip, 4370);
-                        int idwFingerIndex = 0;
-                        int iFlag = 1;
-                        if (Conectado)
+                        Dispositivo.DeviceController.EnableDevice(Dispositivo.MachineNumber, false);
+                        //Actualización de la información del empleado en el dispositivo destino
+                        foreach (DeviceEmployeer empleado in Empleados)
                         {
-                            Dispositivo.DeviceController.EnableDevice(Dispositivo.MachineNumber, false);
-                            //Actualización de la información del empleado en el dispositivo destino
-                            foreach (DeviceEmployeer empleado in Empleados)
+                            Dispositivo.DeviceController.set_STR_CardNumber(1, empleado.NumeroTarjeta);
+                            if (
+                            Dispositivo.DeviceController.SSR_SetUserInfo(Dispositivo.MachineNumber,
+                                                                empleado.NumeroEmpleado,
+                                                                empleado.NombreEmpleado,
+                                                                empleado.Password,
+                                                                empleado.Privilegio,
+                                                                empleado.Enabled))//upload user information to the memory
                             {
-                                Dispositivo.DeviceController.set_STR_CardNumber(1, empleado.NumeroTarjeta);
-                                if (
-                                Dispositivo.DeviceController.SSR_SetUserInfo(Dispositivo.MachineNumber,
-                                                                   empleado.NumeroEmpleado,
-                                                                   empleado.NombreEmpleado,
-                                                                   empleado.Password,
-                                                                   empleado.Privilegio,
-                                                                   empleado.Enabled))//upload user information to the memory
+                                if (empleado.FingerPrint != "" && empleado.FingerPrint != null)
                                 {
-                                    if (empleado.FingerPrint != "" && empleado.FingerPrint != null)
+                                    if (
+                                    Dispositivo.DeviceController.SetUserTmpExStr(Dispositivo.MachineNumber,
+                                                                        empleado.NumeroEmpleado,
+                                                                        idwFingerIndex,
+                                                                        iFlag,
+                                                                        empleado.FingerPrint))//upload templates information to the memory
                                     {
-                                        if (
-                                        Dispositivo.DeviceController.SetUserTmpExStr(Dispositivo.MachineNumber,
-                                                                           empleado.NumeroEmpleado,
-                                                                           idwFingerIndex,
-                                                                           iFlag,
-                                                                           empleado.FingerPrint))//upload templates information to the memory
-                                        {
-                                            response = true; //Los datos fueron escritos correctamente
-                                        }
-                                        else
-                                        {
-                                            BusinessLogic.Log.EscribeLog("[WARNING] : DeviceDriver.AltaEmpleados: Empleado con error [" + empleado.NombreEmpleado + "]");
-                                        }
+                                        response = true; //Los datos fueron escritos correctamente
                                     }
                                     else
                                     {
-                                        response = true;
+                                        BusinessLogic.Log.EscribeLog("[WARNING] : DeviceDriver.AltaEmpleados: Empleado con error [" + empleado.NombreEmpleado + "]");
                                     }
                                 }
                                 else
                                 {
-                                    BusinessLogic.Log.EscribeLog("[WARNING] : DeviceDriver.AltaEmpleados: Empleado con error [" + empleado.NombreEmpleado + "]");
+                                    response = true;
                                 }
                             }
-                            Dispositivo.DeviceController.RefreshData(Dispositivo.MachineNumber);
-                            Dispositivo.DeviceController.EnableDevice(Dispositivo.MachineNumber, true);
-                            Dispositivo.DeviceController.Disconnect();
-                            if (!response)
+                            else
                             {
-                                BusinessLogic.Log.EscribeLog("[WARNING] : DeviceDriver.AltaEmpleados: No fue posible actualizar la información en el dispositivo [" + Dispositivo.MachineNumber + "]");
+                                BusinessLogic.Log.EscribeLog("[WARNING] : DeviceDriver.AltaEmpleados: Empleado con error [" + empleado.NombreEmpleado + "]");
                             }
+                        }
+                        Dispositivo.DeviceController.RefreshData(Dispositivo.MachineNumber);
+                        Dispositivo.DeviceController.EnableDevice(Dispositivo.MachineNumber, true);
+                        Dispositivo.DeviceController.Disconnect();
+                        if (!response)
+                        {
+                            BusinessLogic.Log.EscribeLog("[WARNING] : DeviceDriver.AltaEmpleados: No fue posible actualizar la información en el dispositivo [" + Dispositivo.MachineNumber + "]");
                         }
                     }
                 }
@@ -231,6 +229,7 @@ namespace AttendanceCore.DeviceAccess
                     Dispositivos.Add(EntradaCEDIS);
                     Dispositivos.Add(ComedorCoorporativo);
                     Dispositivos.Add(ComedorCEDIS);
+                    Dispositivos.Add(EntradaCEDISNorte);
                     Thread A = new Thread(() => ActualizaInformacionEmpleado(EntradaCoorporativo, empleado));
                     A.Start();
                     Thread B = new Thread(() => ActualizaInformacionEmpleado(EntradaCEDIS, empleado));
@@ -239,10 +238,12 @@ namespace AttendanceCore.DeviceAccess
                     C.Start();
                     Thread D = new Thread(() => ActualizaInformacionEmpleado(ComedorCEDIS, empleado));
                     D.Start();
+                    Thread E = new Thread(() => ActualizaInformacionEmpleado(EntradaCEDISNorte, empleado));
                     A.Join();
                     B.Join();
                     C.Join();
                     D.Join();
+                    E.Join();
                     response = true;
                 }
                 catch (Exception exc)
@@ -318,6 +319,7 @@ namespace AttendanceCore.DeviceAccess
                     Dispositivos.Add(EntradaCEDIS);
                     Dispositivos.Add(ComedorCoorporativo);
                     Dispositivos.Add(ComedorCEDIS);
+                    Dispositivos.Add(EntradaCEDISNorte);
                     foreach (Device Dispositivo in Dispositivos)
                     {
                         if (Dispositivo.DeviceController.Connect_Net(Dispositivo.ip, 4370))
@@ -405,7 +407,7 @@ namespace AttendanceCore.DeviceAccess
                             {
                                 Response.Add(log);
                                 log = new GLogData();
-        }
+                            }
                         }
                         Dispositivo.DeviceController.EnableDevice(Dispositivo.MachineNumber, true);
                     }
@@ -413,7 +415,7 @@ namespace AttendanceCore.DeviceAccess
                 }
             }
             catch (Exception exc)
-        {
+            {
                 BusinessLogic.Log.EscribeLog("[ERROR] : DeviceDriver.ObtenerRegistros " + exc.Message);
             }
             return Response;
@@ -522,6 +524,7 @@ namespace AttendanceCore.DeviceAccess
                     Checadores.Add(ComedorCoorporativo);
                     Checadores.Add(EntradaCEDIS);
                     Checadores.Add(ComedorCEDIS);
+                    Checadores.Add(EntradaCEDISNorte);
                     DateTime fechaHoy = DateTime.Now;
                     foreach (Device dispositivo in Checadores)
                     {
