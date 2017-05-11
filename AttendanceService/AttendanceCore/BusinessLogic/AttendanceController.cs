@@ -524,10 +524,9 @@ namespace AttendanceCore.BusinessLogic
                 Empleado RegistroActual = new Empleado(); //Guardar el empleado actual según el ID del registro a renovar.
                 RegistroActual = Attendance.ObtenerEmpleado(empleado.iEmpleadoId);
                 Response = Attendance.ActualizaEmpleado(empleado);
-
                 if (Response)
                 {
-                    if (RegistroActual.NumeroTarjeta != empleado.NumeroTarjeta)
+                    if (RegistroActual.NumeroTarjeta != empleado.NumeroTarjeta || RegistroActual.FingerPrint != empleado.FingerPrint)
                     {
                         DeviceDriver RelojChecador = new DeviceDriver();
                         DeviceEmployeer EmpleadoReloj = new DeviceEmployeer();
@@ -937,6 +936,7 @@ namespace AttendanceCore.BusinessLogic
                 if (BaseDatosAttendance.InsertaRegistroEntradaTlalne(RegDataBase))
                 {
                     Relojes.BorraRegistros(Relojes.EntradaCEDIS);
+                    Relojes.BorraRegistros(Relojes.EntradaCEDISNorte);
                 }
             }
             catch (Exception exc)

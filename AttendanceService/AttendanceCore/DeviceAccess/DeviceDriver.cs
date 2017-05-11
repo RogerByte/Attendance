@@ -224,12 +224,6 @@ namespace AttendanceCore.DeviceAccess
             if (EnableDeviceOperations)
                 try
                 {
-                    List<Device> Dispositivos = new List<Device>();
-                    Dispositivos.Add(EntradaCoorporativo);
-                    Dispositivos.Add(EntradaCEDIS);
-                    Dispositivos.Add(ComedorCoorporativo);
-                    Dispositivos.Add(ComedorCEDIS);
-                    Dispositivos.Add(EntradaCEDISNorte);
                     Thread A = new Thread(() => ActualizaInformacionEmpleado(EntradaCoorporativo, empleado));
                     A.Start();
                     Thread B = new Thread(() => ActualizaInformacionEmpleado(EntradaCEDIS, empleado));
@@ -239,6 +233,7 @@ namespace AttendanceCore.DeviceAccess
                     Thread D = new Thread(() => ActualizaInformacionEmpleado(ComedorCEDIS, empleado));
                     D.Start();
                     Thread E = new Thread(() => ActualizaInformacionEmpleado(EntradaCEDISNorte, empleado));
+                    E.Start();
                     A.Join();
                     B.Join();
                     C.Join();

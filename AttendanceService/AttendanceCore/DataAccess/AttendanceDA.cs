@@ -393,47 +393,68 @@ namespace AttendanceCore.DataAccess
             try
             {
                 command.CommandText = @"INSERT INTO Empleados
-                                        (iEmpleadoId,
-                                        iNumeroEmpleado,
-                                        vchNombreEmpleado,
-                                        vchPassword,
-                                        iPrivilegio,
-                                        bEnabled,
-                                        vchNumeroTarjeta,
-                                        vchFingerPrint,
-                                        iFingerPrintLength,
-                                        iFingerFlag,
-                                        iHorarioId,
-                                        vchNomina,
-                                        vchCompania,
-                                        bExterno,
-                                        bitManager,
-                                        intManagerID,
-                                        vchCorreo,
-                                        vchPasswordAttendance,
-                                        vchNombreUsuario
+                                         (
+                                            iEmpleadoId,
+                                            iNumeroEmpleado,
+                                            vchNombreEmpleado,
+                                            vchPassword,
+                                            iPrivilegio,
+                                            bEnabled,
+                                            vchNumeroTarjeta,
+                                            vchFingerPrint,
+                                            iFingerPrintLength,
+                                            iFingerFlag,
+                                            iHorarioId,
+                                            vchNomina,
+                                            vchCompania,
+                                            bExterno,
+                                            bitManager,
+                                            intManagerID,
+                                            vchCorreo,
+                                            vchPasswordAttendance,
+                                            vchNombreUsuario
                                         )
                                         values
-                                        (" + Empleado.iEmpleadoId + @","
-                                          + Empleado.NumeroEmpleado + @","
-                                          + "'" + Empleado.NombreEmpleado + @"',"
-                                          + "'" + Empleado.Password + @"',"
-                                          + Empleado.Privilegio + @","
-                                          + (Empleado.Enabled ? "1" : "0") + @","
-                                          + "'" + Empleado.NumeroTarjeta + @"',"
-                                          + "'" + Empleado.FingerPrint + @"',"
-                                          + Empleado.FingerPrintLength + @","
-                                          + Empleado.FingerFlag + @","
-                                          + Empleado.HorarioId + @","
-                                          + "'" + Empleado.Nomina + @"',"
-                                          + "'" + Empleado.Compania + @"',"
-                                          + (Empleado.Externo ? "1" : "0") + @","
-                                          + Empleado.EsManager + @","
-                                          + Empleado.ManagerId + @","
-                                          + "'" + Empleado.CorreoElectronico + @"',"
-                                          + "'" + Empleado.PasswordAttendance + @"',"
-                                          + "'" + Empleado.NombreUsuario + @"'"
-                                          + ")";
+                                        (
+                                            @iEmpleadoId,
+                                            @iNumeroEmpleado,
+                                            @vchNombreEmpleado,
+                                            @vchPassword,
+                                            @iPrivilegio,
+                                            @bEnabled,
+                                            @vchNumeroTarjeta,
+                                            @vchFingerPrint,
+                                            @iFingerPrintLength,
+                                            @iFingerFlag,
+                                            @iHorarioId,
+                                            @vchNomina,
+                                            @vchCompania,
+                                            @bExterno,
+                                            @bitManager,
+                                            @intManagerID,
+                                            @vchCorreo,
+                                            @vchPasswordAttendance,
+                                            @vchNombreUsuario
+                                        )";
+                command.Parameters.AddWithValue("@iEmpleadoId", Empleado.iEmpleadoId);
+                command.Parameters.AddWithValue("@iNumeroEmpleado", Empleado.NumeroEmpleado);
+                command.Parameters.AddWithValue("@vchNombreEmpleado", Empleado.NombreEmpleado);
+                command.Parameters.AddWithValue("@vchPassword", Empleado.Password);
+                command.Parameters.AddWithValue("@iPrivilegio", Empleado.Privilegio);
+                command.Parameters.AddWithValue("@bEnabled", Empleado.Enabled);
+                command.Parameters.AddWithValue("@vchNumeroTarjeta", Empleado.NumeroTarjeta);
+                command.Parameters.AddWithValue("@vchFingerPrint", Empleado.FingerPrint);
+                command.Parameters.AddWithValue("@iFingerPrintLength", Empleado.FingerPrintLength);
+                command.Parameters.AddWithValue("@iFingerFlag", Empleado.FingerFlag);
+                command.Parameters.AddWithValue("@iHorarioId", Empleado.HorarioId);
+                command.Parameters.AddWithValue("@vchNomina", Empleado.Nomina);
+                command.Parameters.AddWithValue("@vchCompania", Empleado.Compania);
+                command.Parameters.AddWithValue("@bExterno", Empleado.Externo);
+                command.Parameters.AddWithValue("@bitManager", Empleado.EsManager);
+                command.Parameters.AddWithValue("@intManagerID", Empleado.ManagerId);
+                command.Parameters.AddWithValue("@vchCorreo", Empleado.CorreoElectronico);
+                command.Parameters.AddWithValue("@vchPasswordAttendance", Empleado.PasswordAttendance);
+                command.Parameters.AddWithValue("@vchNombreUsuario", Empleado.NombreUsuario);
                 Conectar();
                 command.ExecuteNonQuery();
                 command.Dispose();
